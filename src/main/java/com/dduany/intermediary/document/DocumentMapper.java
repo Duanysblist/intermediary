@@ -1,7 +1,7 @@
-package com.dduany.intermediary.domain;
+package com.dduany.intermediary.document;
 
-import com.dduany.intermediary.domain.dto.DocumentRequest;
-import com.dduany.intermediary.domain.dto.DocumentResponse;
+import com.dduany.intermediary.document.dto.DocumentRequest;
+import com.dduany.intermediary.document.dto.DocumentResponse;
 
 public final class DocumentMapper {
 

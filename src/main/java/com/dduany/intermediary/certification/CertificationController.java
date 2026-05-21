@@ -1,7 +1,7 @@
-package com.dduany.intermediary.domain;
+package com.dduany.intermediary.certification;
 
-import com.dduany.intermediary.domain.dto.CertificationRequest;
-import com.dduany.intermediary.domain.dto.CertificationResponse;
+import com.dduany.intermediary.certification.dto.CertificationRequest;
+import com.dduany.intermediary.certification.dto.CertificationResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -1,4 +1,4 @@
-package com.dduany.intermediary.domain;
+package com.dduany.intermediary.application;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

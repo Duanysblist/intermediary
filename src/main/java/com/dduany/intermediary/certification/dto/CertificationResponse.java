@@ -1,6 +1,6 @@
-package com.dduany.intermediary.domain.dto;
+package com.dduany.intermediary.certification.dto;
 
-import com.dduany.intermediary.domain.CertificationStatus;
+import com.dduany.intermediary.certification.CertificationStatus;
 import lombok.Getter;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

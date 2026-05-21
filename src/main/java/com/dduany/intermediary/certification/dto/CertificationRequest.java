@@ -1,6 +1,6 @@
-package com.dduany.intermediary.domain.dto;
+package com.dduany.intermediary.certification.dto;
 
-import com.dduany.intermediary.domain.CertificationStatus;
+import com.dduany.intermediary.certification.CertificationStatus;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;

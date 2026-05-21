@@ -1,7 +1,7 @@
-package com.dduany.intermediary.domain;
+package com.dduany.intermediary.application;
 
-import com.dduany.intermediary.domain.dto.ApplicationRequest;
-import com.dduany.intermediary.domain.dto.ApplicationResponse;
+import com.dduany.intermediary.application.dto.ApplicationRequest;
+import com.dduany.intermediary.application.dto.ApplicationResponse;
 
 public final class ApplicationMapper {
 

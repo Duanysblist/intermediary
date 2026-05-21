@@ -1,4 +1,4 @@
-package com.dduany.intermediary.domain;
+package com.dduany.intermediary.document;
 
 public enum DocumentType {
     RESUME,

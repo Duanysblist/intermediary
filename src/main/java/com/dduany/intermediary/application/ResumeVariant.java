@@ -1,4 +1,4 @@
-package com.dduany.intermediary.domain;
+package com.dduany.intermediary.application;
 
 public enum ResumeVariant {
     VARIANT_A_DEFENSE,

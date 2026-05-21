@@ -1,6 +1,6 @@
-package com.dduany.intermediary.domain.dto;
+package com.dduany.intermediary.document.dto;
 
-import com.dduany.intermediary.domain.DocumentType;
+import com.dduany.intermediary.document.DocumentType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;

@@ -1,8 +1,8 @@
-package com.dduany.intermediary.domain.dto;
+package com.dduany.intermediary.application.dto;
 
-import com.dduany.intermediary.domain.ApplicationSource;
-import com.dduany.intermediary.domain.ApplicationStatus;
-import com.dduany.intermediary.domain.ResumeVariant;
+import com.dduany.intermediary.application.ApplicationSource;
+import com.dduany.intermediary.application.ApplicationStatus;
+import com.dduany.intermediary.application.ResumeVariant;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

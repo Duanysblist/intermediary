@@ -1,7 +1,7 @@
-package com.dduany.intermediary.domain;
+package com.dduany.intermediary.application;
 
-import com.dduany.intermediary.domain.dto.ApplicationRequest;
-import com.dduany.intermediary.domain.dto.ApplicationResponse;
+import com.dduany.intermediary.application.dto.ApplicationRequest;
+import com.dduany.intermediary.application.dto.ApplicationResponse;
 import com.dduany.intermediary.exception.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

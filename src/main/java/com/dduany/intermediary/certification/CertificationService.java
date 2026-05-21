@@ -1,7 +1,7 @@
-package com.dduany.intermediary.domain;
+package com.dduany.intermediary.certification;
 
-import com.dduany.intermediary.domain.dto.CertificationRequest;
-import com.dduany.intermediary.domain.dto.CertificationResponse;
+import com.dduany.intermediary.certification.dto.CertificationRequest;
+import com.dduany.intermediary.certification.dto.CertificationResponse;
 import com.dduany.intermediary.exception.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

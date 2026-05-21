@@ -1,7 +1,7 @@
-package com.dduany.intermediary.domain;
+package com.dduany.intermediary.document;
 
-import com.dduany.intermediary.domain.dto.ApplicationRequest;
-import com.dduany.intermediary.domain.dto.ApplicationResponse;
+import com.dduany.intermediary.document.dto.DocumentRequest;
+import com.dduany.intermediary.document.dto.DocumentResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,33 +17,33 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/applications")
-public class ApplicationController {
+@RequestMapping("/documents")
+public class DocumentController {
 
-    private final ApplicationService service;
+    private final DocumentService service;
 
-    public ApplicationController(ApplicationService service) {
+    public DocumentController(DocumentService service) {
         this.service = service;
     }
 
     @GetMapping
-    public List<ApplicationResponse> findAll() {
+    public List<DocumentResponse> findAll() {
         return service.findAll();
     }
 
     @GetMapping("/{id}")
-    public ApplicationResponse findById(@PathVariable Long id) {
+    public DocumentResponse findById(@PathVariable Long id) {
         return service.findById(id);
     }
 
     @PostMapping
-    public ResponseEntity<ApplicationResponse> create(@Valid @RequestBody ApplicationRequest request) {
-        ApplicationResponse response = service.create(request);
+    public ResponseEntity<DocumentResponse> create(@Valid @RequestBody DocumentRequest request) {
+        DocumentResponse response = service.create(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PutMapping("/{id}")
-    public ApplicationResponse update(@PathVariable Long id, @Valid @RequestBody ApplicationRequest request) {
+    public DocumentResponse update(@PathVariable Long id, @Valid @RequestBody DocumentRequest request) {
         return service.update(id, request);
     }
 

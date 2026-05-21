@@ -1,6 +1,6 @@
-package com.dduany.intermediary.domain.dto;
+package com.dduany.intermediary.document.dto;
 
-import com.dduany.intermediary.domain.DocumentType;
+import com.dduany.intermediary.document.DocumentType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
