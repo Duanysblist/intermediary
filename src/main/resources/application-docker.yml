@@ -1,0 +1,17 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://intermediary-db:5432/intermediary
+    username: intermediary
+    password: devpassword
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+
+logging:
+  level:
+    org.hibernate.SQL: INFO
+    org.hibernate.orm.jdbc.bind: INFO
