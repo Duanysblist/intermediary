@@ -39,7 +39,7 @@ public class PlanItemService {
     public PlanItemResponse findById(Long id){
         PlanItem planItem = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "PlanItem not found with id: " + id
+                        "Plan item not found with id: " + id
                 ));
         return PlanItemMapper.toResponse(planItem);
     }
@@ -55,7 +55,7 @@ public class PlanItemService {
     public PlanItemResponse update(Long id, PlanItemRequest request) {
         PlanItem existing = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "PlanItem not found with id: " + id
+                        "Plan item not found with id: " + id
                 ));
 
         // capture BEFORE setting
@@ -86,7 +86,7 @@ public class PlanItemService {
     @Transactional
     public void delete(Long id){
         if (!repository.existsById(id)) {
-            throw new ResourceNotFoundException("PlanItem not found with id: " + id);
+            throw new ResourceNotFoundException("Plan item not found with id: " + id);
         }
         repository.deleteById(id);
     }

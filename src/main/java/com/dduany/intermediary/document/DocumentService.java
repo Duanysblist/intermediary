@@ -29,7 +29,7 @@ public class DocumentService {
     public DocumentResponse findById(Long id){
         Document document = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Document not found with id " + id
+                        "Document not found with id: " + id
                 ));
         return DocumentMapper.toResponse(document);
     }
@@ -41,19 +41,18 @@ public class DocumentService {
                 .toList();
     }
 
-    // TODO: Use preserve-existing. Look at Application Service.
     @Transactional
     public DocumentResponse update(Long id, DocumentRequest request){
         Document existing = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Document not found with id " + id
+                        "Document not found with id: " + id
         ));
 
         existing.setTitle(request.getTitle());
         existing.setPath(request.getPath());
         existing.setType(request.getType() != null ? request.getType() : existing.getType());
         existing.setVersion(request.getVersion() !=  null ? request.getVersion() : existing.getVersion());
-        existing.setNotes(request.getNotes());
+        existing.setNotes(request.getNotes() != null ? request.getNotes() : existing.getNotes());
 
         Document saved = repository.save(existing);
         return DocumentMapper.toResponse(saved);

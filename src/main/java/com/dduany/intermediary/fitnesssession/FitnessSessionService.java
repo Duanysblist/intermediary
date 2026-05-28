@@ -28,7 +28,7 @@ public class FitnessSessionService {
     public FitnessSessionResponse findById(Long id) {
         FitnessSession fitnessSession = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "FitnessSession not found with id " + id
+                        "Fitness session not found with id: " + id
                 ));
         return FitnessSessionMapper.toResponse(fitnessSession);
     }
@@ -44,7 +44,7 @@ public class FitnessSessionService {
     public FitnessSessionResponse update(Long id, FitnessSessionRequest request) {
         FitnessSession existing = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "FitnessSession not found with id " + id
+                        "Fitness session not found with id: " + id
                 ));
 
         existing.setSessionDate(request.getSessionDate());
@@ -59,7 +59,7 @@ public class FitnessSessionService {
     @Transactional
     public void delete(Long id) {
         if (!repository.existsById(id)) {
-            throw new ResourceNotFoundException("FitnessSession not found with id: " + id);
+            throw new ResourceNotFoundException("Fitness session not found with id: " + id);
         }
         repository.deleteById(id);
     }

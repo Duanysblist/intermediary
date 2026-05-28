@@ -28,7 +28,7 @@ public class ApplicationService {
     public ApplicationResponse findById(Long id){
         Application application = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Application not found with id " + id
+                        "Application not found with id: " + id
                 ));
         return ApplicationMapper.toResponse(application);
     }
@@ -44,7 +44,7 @@ public class ApplicationService {
     public ApplicationResponse update(Long id, ApplicationRequest request){
         Application existing = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Application not found with id " + id
+                        "Application not found with id: " + id
                 ));
 
         existing.setCompany(request.getCompany());
@@ -68,7 +68,7 @@ public class ApplicationService {
     @Transactional
     public void delete(Long id){
         if (!repository.existsById(id)) {
-            throw new ResourceNotFoundException("Application not found with id " + id);
+            throw new ResourceNotFoundException("Application not found with id: " + id);
         }
         repository.deleteById(id);
     }

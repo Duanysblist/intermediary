@@ -55,9 +55,9 @@ public class CertificationService {
         existing.setName(request.getName());
         existing.setVendor(request.getVendor());
         existing.setStatus(request.getStatus() != null ? request.getStatus() : existing.getStatus());
-        existing.setExamDate(request.getExamDate());
+        existing.setExamDate(request.getExamDate() != null ? request.getExamDate() : existing.getExamDate());
         existing.setHoursStudied(request.getHoursStudied() != null ? request.getHoursStudied() : existing.getHoursStudied());
-        existing.setNotes(request.getNotes());
+        existing.setNotes(request.getNotes() != null ? request.getNotes() : existing.getNotes());
 
         Certification saved = repository.save(existing);
         return CertificationMapper.toResponse(saved);

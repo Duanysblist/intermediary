@@ -51,3 +51,7 @@ application-dev.properties
 ### Logs ###
 *.log
 logs/
+
+# Local planning / scratchpad files
+NEXT_SESSION.md
+SCRATCH.md

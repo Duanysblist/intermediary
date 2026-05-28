@@ -25,25 +25,25 @@ public class Application {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "company")
+    @Column(name = "company", nullable = false)
     private String company;
 
-    @Column(name = "role")
+    @Column(name = "role", nullable = false)
     private String role;
 
-    @Column(name = "application_date")
+    @Column(name = "application_date", nullable = false)
     private LocalDate applicationDate;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status")
+    @Column(name = "status", nullable = false)
     private ApplicationStatus status;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "source")
+    @Column(name = "source", nullable = false)
     private ApplicationSource source;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "resume_variant")
+    @Column(name = "resume_variant", nullable = false)
     private ResumeVariant resumeVariant;
 
     @Column(name = "location")
@@ -67,8 +67,10 @@ public class Application {
     private String notes;
 
     @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
+    @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 }
