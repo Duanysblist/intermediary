@@ -8,6 +8,16 @@ The architecture deliberately separates **intention** from **reality**. *PlanIte
 
 This is an intermediary, not a chatbot wrapper. The AI doesn't live inside the app — it consumes the same REST endpoints any external client would. That separation is the point: the JSON contract is the API for *every* consumer, human-facing UI included.
 
+## Live Demo
+
+The API is deployed and live, with an interactive Swagger UI:
+
+**[https://intermediary-loxn.onrender.com/swagger-ui.html](https://intermediary-loxn.onrender.com/swagger-ui.html)**
+
+Every endpoint is explorable in the browser — expand an operation, click
+**Try it out**, and send a real request against the running service. No setup
+required.
+
 ## Status
 
 **Phase 1 — the planning data layer — is complete:**
@@ -98,7 +108,9 @@ To stop the stack: `docker-compose down`. To reset all data: `docker-compose dow
 
 **Data:** PostgreSQL 17
 
-**Infrastructure:** Docker, Docker Compose, multi-stage Dockerfile
+**API Docs:** OpenAPI 3 / Swagger UI (springdoc)
+
+**Infrastructure:** Docker, Docker Compose, multi-stage Dockerfile, Render (live deployment)
 
 **Patterns:** Layered architecture, DTO/Mapper separation, polymorphic references, append-only audit logging, Spring Application Events with transactional listeners
 
@@ -161,8 +173,11 @@ join a closed transaction.
 ## Roadmap
 
 **Phase 1 (complete)** — Planning data layer. 7 entities with REST CRUD, event-driven audit logging, containerized deployment.
+- **Containerized**: full stack starts with `docker-compose up`
+- **Interactive API docs** via OpenAPI/Swagger (springdoc)
+- **Deployed live** on Render with managed PostgreSQL
 
-**Phase 1 polish (in progress)** — JUnit + Testcontainers tests, `@ControllerAdvice` for structured error responses, springdoc OpenAPI documentation, GitHub Actions CI.
+**Phase 1 polish (in progress)** — JUnit + Testcontainers tests, `@ControllerAdvice` for structured error responses, GitHub Actions CI.
 
 **Phase 2** — Drag-and-drop frontend (Next.js + Tailwind), AWS deployment (ECS or EKS), Spring Security with JWT, microservices split using Kafka for inter-service events.
 
