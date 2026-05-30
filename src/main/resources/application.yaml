@@ -3,9 +3,9 @@ spring:
     name: intermediary
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/intermediary
-    username: intermediary
-    password: devpassword
+    url: "${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/intermediary}"
+    username: "${SPRING_DATASOURCE_USERNAME:intermediary}"
+    password: "${SPRING_DATASOURCE_PASSWORD:devpassword}"
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -21,3 +21,6 @@ logging:
   level:
     org.hibernate.SQL: DEBUG
     org.hibernate.orm.jdbc.bind: TRACE
+
+server:
+  port: ${PORT:8080}
