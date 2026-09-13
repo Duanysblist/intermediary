@@ -25,7 +25,7 @@ public class PlanItemRequest {
     @Size(max = 200, message = "Title must be 200 characters or fewer")
     private String title;
 
-    @NotNull(message = "PlanIntent is required")
+    @NotNull(message = "Intent is required")
     private PlanIntent intent;
 
     private LocalDate targetDate;

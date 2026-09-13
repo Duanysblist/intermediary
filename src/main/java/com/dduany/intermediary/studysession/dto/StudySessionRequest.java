@@ -18,11 +18,11 @@ import java.time.LocalDateTime;
 @Builder
 public class StudySessionRequest {
 
-    @NotNull(message = "Session date is required")
+    @NotNull(message = "Start time is required")
     private LocalDateTime sessionDate;
 
-    @NotNull(message = "Duration minutes is required")
-    @Positive
+    @NotNull(message = "Duration is required")
+    @Positive(message = "Duration must be at least one minute")
     private Integer durationMinutes;
 
     private Long certificationId;

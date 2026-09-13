@@ -19,11 +19,11 @@ import java.time.LocalDateTime;
 @Builder
 public class FitnessSessionRequest {
 
-    @NotNull(message = "Session date is required")
+    @NotNull(message = "Start time is required")
     private LocalDateTime sessionDate;
 
-    @NotNull(message = "Duration minutes is required")
-    @Positive
+    @NotNull(message = "Duration is required")
+    @Positive(message = "Duration must be at least one minute")
     private Integer durationMinutes;
 
     @NotNull(message = "Workout type is required")
