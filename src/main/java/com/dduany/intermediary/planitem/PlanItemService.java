@@ -69,7 +69,7 @@ public class PlanItemService {
         existing.setReferenceEntityId(request.getReferenceEntityId() != null ? request.getReferenceEntityId() : existing.getReferenceEntityId());
         existing.setNotes(request.getNotes() != null ? request.getNotes() : existing.getNotes());
 
-        PlanItem saved = repository.save(existing);
+        PlanItem saved = repository.saveAndFlush(existing);
 
         PlanItemStatus newStatus = saved.getStatus();
         if (oldStatus != newStatus){

@@ -54,7 +54,7 @@ public class DocumentService {
         existing.setVersion(request.getVersion() !=  null ? request.getVersion() : existing.getVersion());
         existing.setNotes(request.getNotes() != null ? request.getNotes() : existing.getNotes());
 
-        Document saved = repository.save(existing);
+        Document saved = repository.saveAndFlush(existing);
         return DocumentMapper.toResponse(saved);
     }
 

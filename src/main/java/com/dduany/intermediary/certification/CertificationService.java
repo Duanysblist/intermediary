@@ -59,7 +59,7 @@ public class CertificationService {
         existing.setHoursStudied(request.getHoursStudied() != null ? request.getHoursStudied() : existing.getHoursStudied());
         existing.setNotes(request.getNotes() != null ? request.getNotes() : existing.getNotes());
 
-        Certification saved = repository.save(existing);
+        Certification saved = repository.saveAndFlush(existing);
         return CertificationMapper.toResponse(saved);
     }
 

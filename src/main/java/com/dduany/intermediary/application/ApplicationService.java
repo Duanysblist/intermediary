@@ -61,7 +61,7 @@ public class ApplicationService {
         existing.setSalaryRangeMax(request.getSalaryRangeMax() != null ? request.getSalaryRangeMax() : existing.getSalaryRangeMax());
         existing.setNotes(request.getNotes() != null ? request.getNotes() : existing.getNotes());
 
-        Application saved = repository.save(existing);
+        Application saved = repository.saveAndFlush(existing);
         return ApplicationMapper.toResponse(saved);
     }
 

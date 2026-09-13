@@ -55,7 +55,7 @@ public class StudySessionService {
         existing.setCertificationId(request.getCertificationId() != null ? request.getCertificationId() : existing.getCertificationId());
         existing.setNotes(request.getNotes() != null ? request.getNotes(): existing.getNotes());
 
-        StudySession saved = repository.save(existing);
+        StudySession saved = repository.saveAndFlush(existing);
         return StudySessionMapper.toResponse(saved);
     }
 

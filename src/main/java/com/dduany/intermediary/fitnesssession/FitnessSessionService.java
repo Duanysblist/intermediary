@@ -52,7 +52,7 @@ public class FitnessSessionService {
         existing.setWorkoutType(request.getWorkoutType());
         existing.setNotes(request.getNotes() != null ? request.getNotes() : existing.getNotes());
 
-        FitnessSession saved = repository.save(existing);
+        FitnessSession saved = repository.saveAndFlush(existing);
         return FitnessSessionMapper.toResponse(saved);
     }
 
