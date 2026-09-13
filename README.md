@@ -12,9 +12,11 @@ This is an intermediary, not a chatbot wrapper. The AI doesn't live inside the a
 
 The API is deployed and live, with an interactive Swagger UI:
 
-**[https://intermediary-loxn.onrender.com/swagger-ui.html](https://intermediary-loxn.onrender.com/swagger-ui.html)**
+**Frontend:** [intermediary-frontend.vercel.app](https://intermediary-frontend.vercel.app) — sign in, or open [/demo](https://intermediary-frontend.vercel.app/demo) for a no-login walkthrough with sample data.
 
-Every endpoint is explorable in the browser — expand an operation, click
+**API:** [https://intermediary-loxn.onrender.com/swagger-ui.html](https://intermediary-loxn.onrender.com/swagger-ui.html) (the docs are public; calls need a sign-in token)
+
+Every endpoint is explorable in the browser — sign in via `POST /auth/login`, click **Authorize**, expand an operation, click
 **Try it out**, and send a real request against the running service. No setup
 required.
 
@@ -27,7 +29,7 @@ required.
 - **Feature-based package organization** — each entity is a self-contained module
 - **Containerized**: full stack starts with `docker-compose up`
 
-**In progress:** JUnit + Testcontainers tests, `@ControllerAdvice` for structured error responses, OpenAPI documentation via springdoc.
+**Also done:** Testcontainers test suite, validation error handler, OpenAPI docs, JWT sign-in, Claude schedule suggestions.
 
 **Phase 2 (in progress):** drag-and-drop frontend is live in [intermediary-frontend](https://github.com/Duanysblist/intermediary-frontend) (React + Vite + Tailwind). Remaining: AWS deployment, microservices split with Kafka.
 
@@ -129,6 +131,24 @@ compose database with user `intermediary` / password `devpassword`; enter the
 password once when prompted. The Endpoints tool window lists every controller
 route and can generate HTTP Client requests for them.
 
+## Deploying
+
+The API runs anywhere the Docker image runs (it is live on Render). Set these environment
+variables; the app refuses to fall back to known defaults for anything secret:
+
+| Variable | Purpose |
+|---|---|
+| `SPRING_DATASOURCE_URL`, `SPRING_DATASOURCE_USERNAME`, `SPRING_DATASOURCE_PASSWORD` | PostgreSQL connection. |
+| `APP_USERNAME`, `APP_PASSWORD` | The single account used to sign in. If `APP_PASSWORD` is unset a random one is generated and printed in the startup log. |
+| `APP_JWT_SECRET` | At least 32 bytes (`openssl rand -base64 48`). If unset a random secret is used and every restart signs everyone out. |
+| `APP_TOKEN_TTL_HOURS` | How long a sign-in lasts. Default 72. |
+| `APP_CORS_ORIGINS` | Comma-separated browser origins allowed to call the API, e.g. the Vercel URL. |
+| `ANTHROPIC_API_KEY` | Optional. Enables `POST /ai/suggest` (Claude-generated schedule changes). Leave unset to disable. |
+| `APP_AI_MODEL` | Optional. Defaults to `claude-opus-5`. |
+
+Every endpoint except `POST /auth/login` and the OpenAPI docs requires `Authorization: Bearer <token>`.
+In Swagger UI, call `/auth/login`, then click **Authorize** and paste the token.
+
 ## Tech Stack
 
 **Backend:** Java 21, Spring Boot 3.5, Spring Data JPA, Hibernate, Jakarta Bean Validation, Lombok, Maven
@@ -199,6 +219,19 @@ write in a separate transaction — this is necessary because default
 `REQUIRED` propagation silently fails in the AFTER_COMMIT phase by trying to
 join a closed transaction.
 
+## Claude Integration
+
+The AI is a client of the API, never part of it. Two paths, both ending in the same review step in the frontend:
+
+- **Server-side:** `POST /ai/suggest` takes the same context block the frontend's Prompt page builds
+  and calls Claude (Anthropic Java SDK, structured output constrained to the `ChangeSet` record in
+  `ai/dto`). The response is a list of proposed plan-item updates and creations with reasons.
+  Requires `ANTHROPIC_API_KEY`; `GET /ai/status` tells the frontend whether it is available.
+- **Copy/paste:** the Prompt page asks any assistant for the same JSON shape, and the frontend imports it.
+
+Nothing is applied server-side by the AI. The frontend shows each change as before → after; accepted
+changes go through the ordinary `PUT /plan-items/{id}` and `POST /plan-items`, so the audit log records them.
+
 ## Roadmap
 
 **Phase 1 (complete)** — Planning data layer. 7 entities with REST CRUD, event-driven audit logging, containerized deployment.
@@ -206,8 +239,8 @@ join a closed transaction.
 - **Interactive API docs** via OpenAPI/Swagger (springdoc)
 - **Deployed live** on Render with managed PostgreSQL
 
-**Phase 1 polish (in progress)** — JUnit + Testcontainers tests, `@ControllerAdvice` for structured error responses, GitHub Actions CI.
+**Phase 1 polish** — JUnit + Testcontainers tests: done. `@ControllerAdvice` for validation errors: done. Still to do: GitHub Actions CI.
 
-**Phase 2 (in progress)** — Drag-and-drop frontend: done, see [intermediary-frontend](https://github.com/Duanysblist/intermediary-frontend) (board + week views, sessions, prompt builder). Still to do: AWS deployment (ECS or EKS), Spring Security with JWT, microservices split using Kafka for inter-service events.
+**Phase 2 (in progress)** — Drag-and-drop frontend and JWT sign-in: done, see [intermediary-frontend](https://github.com/Duanysblist/intermediary-frontend) (board + week views, sessions, prompt builder). Still to do: AWS deployment (ECS or EKS), microservices split using Kafka for inter-service events.
 
-**Phase 3** — AI integration (the JSON contract becomes a Claude tool or MCP server), full plan-vs-reality analytics, mobile-friendly UI.
+**Phase 3 (started)** — AI integration: done for schedule suggestions (`POST /ai/suggest` plus the review/import flow in the frontend, see Claude Integration). Next: expose the API as an MCP server, full plan-vs-reality analytics.

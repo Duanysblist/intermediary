@@ -24,3 +24,21 @@ logging:
 
 server:
   port: ${PORT:8080}
+
+# Deployment settings. Defaults are for local development only; set the
+# environment variables in production (see README "Deploying").
+app:
+  auth:
+    username: ${APP_USERNAME:dev}
+    # Leave APP_PASSWORD unset and a random password is generated and printed in the log at startup.
+    password: ${APP_PASSWORD:}
+    # At least 32 bytes; generate with: openssl rand -base64 48. Unset = random per start (tokens die on restart).
+    jwt-secret: ${APP_JWT_SECRET:}
+    token-ttl-hours: ${APP_TOKEN_TTL_HOURS:72}
+  cors:
+    # Comma-separated list of browser origins allowed to call the API.
+    allowed-origins: ${APP_CORS_ORIGINS:http://localhost:5173,https://intermediary-frontend.vercel.app}
+  ai:
+    # Leave empty to disable POST /ai/suggest.
+    api-key: ${ANTHROPIC_API_KEY:}
+    model: ${APP_AI_MODEL:claude-opus-5}

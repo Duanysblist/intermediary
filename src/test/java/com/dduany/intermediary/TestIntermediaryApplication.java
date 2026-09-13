@@ -10,6 +10,9 @@ import org.springframework.boot.SpringApplication;
 public class TestIntermediaryApplication {
 
 	public static void main(String[] args) {
+		// Predictable dev login for the IDE launcher; production reads these from the environment.
+		System.setProperty("app.auth.username", System.getProperty("app.auth.username", "dev"));
+		System.setProperty("app.auth.password", System.getProperty("app.auth.password", "dev"));
 		SpringApplication.from(IntermediaryApplication::main)
 				.with(TestcontainersConfiguration.class)
 				.run(args);

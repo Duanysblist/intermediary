@@ -6,6 +6,11 @@
     <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UpdateClassesAndResources" />
     <option name="UPDATE_ACTION_UPDATE_POLICY" value="UpdateClassesAndResources" />
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+    <envs>
+      <env name="APP_USERNAME" value="dev" />
+      <env name="APP_PASSWORD" value="dev" />
+      <env name="APP_JWT_SECRET" value="dev-only-secret-change-me-in-production-0123456789" />
+    </envs>
     <module name="intermediary" />
     <option name="SPRING_BOOT_MAIN_CLASS" value="com.dduany.intermediary.IntermediaryApplication" />
     <method v="2">

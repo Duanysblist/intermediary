@@ -1,10 +1,25 @@
-### Health / API docs
-# Swagger UI: {{baseUrl}}/swagger-ui.html
+### Sign in (stores the token for the requests below)
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "username": "{{username}}",
+  "password": "{{password}}"
+}
+
+> {% client.global.set("token", response.body.token); %}
+
+### Who am I
+GET {{baseUrl}}/auth/me
+Authorization: Bearer {{token}}
+
+### API docs (public)
 GET {{baseUrl}}/v3/api-docs
 Accept: application/json
 
 ### Create a plan item
 POST {{baseUrl}}/plan-items
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
@@ -16,9 +31,11 @@ Content-Type: application/json
 
 ### Get the plan item
 GET {{baseUrl}}/plan-items/{{planItemId}}
+Authorization: Bearer {{token}}
 
 ### Update its status (triggers a PlanEvent audit entry)
 PUT {{baseUrl}}/plan-items/{{planItemId}}
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
@@ -27,23 +44,40 @@ Content-Type: application/json
   "status": "DONE"
 }
 
-### List all plan items
-GET {{baseUrl}}/plan-items
-
 ### View the audit log
 GET {{baseUrl}}/plan-events
+Authorization: Bearer {{token}}
+
+### Is Claude configured on this server?
+GET {{baseUrl}}/ai/status
+Authorization: Bearer {{token}}
+
+### Ask Claude for schedule changes (needs ANTHROPIC_API_KEY on the server)
+POST {{baseUrl}}/ai/suggest
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "context": "# Planning context\n## Plan items (open only) — 1\n```json\n[{\"id\": 1, \"title\": \"Try the HTTP client\", \"intent\": \"READ\", \"status\": \"DONE\", \"targetDate\": null}]\n```",
+  "request": "Anything I should follow up on?"
+}
 
 ### Other collections
 GET {{baseUrl}}/certifications
+Authorization: Bearer {{token}}
 
 ###
 GET {{baseUrl}}/applications
+Authorization: Bearer {{token}}
 
 ###
 GET {{baseUrl}}/documents
+Authorization: Bearer {{token}}
 
 ###
 GET {{baseUrl}}/study-sessions
+Authorization: Bearer {{token}}
 
 ###
 GET {{baseUrl}}/fitness-sessions
+Authorization: Bearer {{token}}

@@ -32,11 +32,33 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: docker
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-devpassword}
+      APP_USERNAME: ${APP_USERNAME:-dev}
+      APP_PASSWORD: ${APP_PASSWORD:-dev}
+      APP_JWT_SECRET: ${APP_JWT_SECRET:-dev-only-secret-change-me-in-production-0123456789}
+      APP_CORS_ORIGINS: ${APP_CORS_ORIGINS:-http://localhost:5173,http://localhost:3000}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
     ports:
       - "127.0.0.1:8080:8080"
     depends_on:
       intermediary-db:
         condition: service_healthy
+
+  # ============================================================
+  # Frontend (optional). Needs ../intermediary-frontend checked out beside this repo.
+  #   docker compose --profile web up --build
+  # ============================================================
+  intermediary-web:
+    build:
+      context: ../intermediary-frontend
+      args:
+        VITE_API_BASE_URL: http://localhost:8080
+    image: intermediary-web:latest
+    container_name: intermediary-web
+    profiles: ["web"]
+    ports:
+      - "127.0.0.1:3000:80"
+    depends_on:
+      - intermediary-app
 
 volumes:
   # Named volume managed by Compose: survives `docker compose down`,
