@@ -9,11 +9,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-// TODO: cross-field validation that (referenceEntityType, referenceEntityId) are both set
-// or both null. Currently a client can send just one. Deferred to Phase 2.
-//
+// TODO: cross-field validation that (referenceEntityType, referenceEntityId) are both set or both null.
 // TODO: validate referenceEntityId points to an existing entity of the given type.
-// Deferred to Phase 2 along with full JPA relationship modeling.
 @Service
 public class PlanItemService {
 

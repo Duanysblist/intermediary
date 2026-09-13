@@ -1,7 +1,6 @@
 package com.dduany.intermediary.planevent;
 
 import com.dduany.intermediary.exception.ResourceNotFoundException;
-import com.dduany.intermediary.planevent.dto.PlanEventRequest;
 import com.dduany.intermediary.planevent.dto.PlanEventResponse;
 import com.dduany.intermediary.planitem.PlanItemStatus;
 import org.springframework.stereotype.Service;
@@ -18,13 +17,6 @@ public class PlanEventService {
 
     public PlanEventService(PlanEventRepository repository) {
         this.repository = repository;
-    }
-
-    @Transactional
-    public PlanEventResponse create(PlanEventRequest request) {
-        PlanEvent event = PlanEventMapper.toEntity(request);
-        PlanEvent saved = repository.save(event);
-        return PlanEventMapper.toResponse(saved);
     }
 
     /**

@@ -12,7 +12,6 @@ import java.util.List;
 public class StudySessionService {
 
     // TODO: validate certificationId exists in CertificationRepository.
-    // Deferred to Phase 2 along with full JPA relationship modeling.
 
     private final StudySessionRepository repository;
 

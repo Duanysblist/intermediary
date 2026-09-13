@@ -81,3 +81,39 @@ Authorization: Bearer {{token}}
 ###
 GET {{baseUrl}}/fitness-sessions
 Authorization: Bearer {{token}}
+
+### Routines: create one, then generate the next two weeks of plan items
+POST {{baseUrl}}/recurring-plans
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Morning run",
+  "intent": "EXERCISE",
+  "days": ["MONDAY", "WEDNESDAY", "FRIDAY"]
+}
+
+###
+POST {{baseUrl}}/recurring-plans/generate?days=14
+Authorization: Bearer {{token}}
+
+### Proposals waiting for review (what the MCP server posts)
+GET {{baseUrl}}/proposals?status=PENDING
+Authorization: Bearer {{token}}
+
+### Submit a proposal by hand
+POST {{baseUrl}}/proposals
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "source": "http-client",
+  "summary": "Take the sample item off the calendar",
+  "changes": [
+    { "op": "update", "id": {{planItemId}}, "fields": { "targetDate": "CLEAR" }, "reason": "manual test" }
+  ]
+}
+
+### Calendar feed link (paste into a calendar app)
+GET {{baseUrl}}/calendar/link
+Authorization: Bearer {{token}}
