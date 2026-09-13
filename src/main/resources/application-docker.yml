@@ -1,9 +1,8 @@
+# Active inside the docker-compose stack (SPRING_PROFILES_ACTIVE=docker).
+# Only the DB host differs; credentials come from the environment via application.yaml.
 spring:
   datasource:
     url: jdbc:postgresql://intermediary-db:5432/intermediary
-    username: intermediary
-    password: devpassword
-    driver-class-name: org.postgresql.Driver
 
   jpa:
     show-sql: false

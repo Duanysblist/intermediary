@@ -30,10 +30,16 @@ FROM eclipse-temurin:21-jre
 
 WORKDIR /app
 
+# Run as an unprivileged user: the app needs no root inside the container.
+RUN useradd --system --uid 1001 --home /app --shell /usr/sbin/nologin app \
+    && chown app:app /app
+
 # Copy only the built JAR from the builder stage.
 # This is the multi-stage magic — none of the build environment
 # carries into the runtime image.
 COPY --from=builder /build/target/*.jar app.jar
+
+USER app
 
 # Document the port the application listens on.
 EXPOSE 8080

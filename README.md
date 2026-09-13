@@ -29,7 +29,7 @@ required.
 
 **In progress:** JUnit + Testcontainers tests, `@ControllerAdvice` for structured error responses, OpenAPI documentation via springdoc.
 
-**Phase 2:** Drag-and-drop frontend (Next.js + Tailwind), AWS deployment, microservices split with Kafka.
+**Phase 2 (in progress):** drag-and-drop frontend is live in [intermediary-frontend](https://github.com/Duanysblist/intermediary-frontend) (React + Vite + Tailwind). Remaining: AWS deployment, microservices split with Kafka.
 
 ## How Audit Logging Works
 
@@ -102,6 +102,33 @@ curl http://localhost:8080/plan-events
 
 To stop the stack: `docker-compose down`. To reset all data: `docker-compose down -v`.
 
+## Local Development (IntelliJ)
+
+Prerequisites: [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+running, and JDK 21 (IntelliJ registers it as `ms-21`; `JAVA_HOME` should point
+to it so `./mvnw` works from a terminal). The default dev credentials work out of
+the box; to change them, copy `.env.example` to `.env` (gitignored).
+
+Shared run configurations live in `.run/` and appear in the IntelliJ run
+dropdown after opening the project:
+
+| Run configuration | What it does |
+|---|---|
+| `DB (docker compose)` | Starts only PostgreSQL from `docker-compose.yml` (port 5432). |
+| `IntermediaryApplication (local)` | Starts the DB container, then runs the app from the IDE on port 8080. Supports breakpoints and devtools hot reload. |
+| `IntermediaryApplication (testcontainers)` | Runs the app against a throwaway Testcontainers PostgreSQL. No compose needed; data is discarded on exit. |
+| `All tests (JUnit)` | Runs the test suite. Tests start their own PostgreSQL via Testcontainers. |
+| `Full stack (docker compose)` | Builds the app image and runs app + DB in Docker, exactly like production. |
+| `Maven verify` | `./mvnw clean verify` through IntelliJ. |
+
+Explore and call the API from `http://localhost:8080/swagger-ui.html`, or open
+`http/api.http` (IntelliJ HTTP Client; pick the `local` or `render` environment).
+
+The IDE data source `intermediary@localhost` (Database tool window) connects to the
+compose database with user `intermediary` / password `devpassword`; enter the
+password once when prompted. The Endpoints tool window lists every controller
+route and can generate HTTP Client requests for them.
+
 ## Tech Stack
 
 **Backend:** Java 21, Spring Boot 3.5, Spring Data JPA, Hibernate, Jakarta Bean Validation, Lombok, Maven
@@ -114,7 +141,9 @@ To stop the stack: `docker-compose down`. To reset all data: `docker-compose dow
 
 **Patterns:** Layered architecture, DTO/Mapper separation, polymorphic references, append-only audit logging, Spring Application Events with transactional listeners
 
-**Planned (Phase 2+):** Next.js + Tailwind (frontend), Kafka, AWS deployment, Spring Security with JWT
+**Frontend:** React 19 + Vite + Tailwind 4, TanStack Query, dnd-kit ([intermediary-frontend](https://github.com/Duanysblist/intermediary-frontend))
+
+**Planned (Phase 2+):** Kafka, AWS deployment, Spring Security with JWT
 
 ## Key Patterns
 
@@ -179,6 +208,6 @@ join a closed transaction.
 
 **Phase 1 polish (in progress)** — JUnit + Testcontainers tests, `@ControllerAdvice` for structured error responses, GitHub Actions CI.
 
-**Phase 2** — Drag-and-drop frontend (Next.js + Tailwind), AWS deployment (ECS or EKS), Spring Security with JWT, microservices split using Kafka for inter-service events.
+**Phase 2 (in progress)** — Drag-and-drop frontend: done, see [intermediary-frontend](https://github.com/Duanysblist/intermediary-frontend) (board + week views, sessions, prompt builder). Still to do: AWS deployment (ECS or EKS), Spring Security with JWT, microservices split using Kafka for inter-service events.
 
 **Phase 3** — AI integration (the JSON contract becomes a Claude tool or MCP server), full plan-vs-reality analytics, mobile-friendly UI.

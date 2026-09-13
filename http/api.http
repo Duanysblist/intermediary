@@ -1,0 +1,49 @@
+### Health / API docs
+# Swagger UI: {{baseUrl}}/swagger-ui.html
+GET {{baseUrl}}/v3/api-docs
+Accept: application/json
+
+### Create a plan item
+POST {{baseUrl}}/plan-items
+Content-Type: application/json
+
+{
+  "title": "Try the HTTP client",
+  "intent": "READ"
+}
+
+> {% client.global.set("planItemId", response.body.id); %}
+
+### Get the plan item
+GET {{baseUrl}}/plan-items/{{planItemId}}
+
+### Update its status (triggers a PlanEvent audit entry)
+PUT {{baseUrl}}/plan-items/{{planItemId}}
+Content-Type: application/json
+
+{
+  "title": "Try the HTTP client",
+  "intent": "READ",
+  "status": "DONE"
+}
+
+### List all plan items
+GET {{baseUrl}}/plan-items
+
+### View the audit log
+GET {{baseUrl}}/plan-events
+
+### Other collections
+GET {{baseUrl}}/certifications
+
+###
+GET {{baseUrl}}/applications
+
+###
+GET {{baseUrl}}/documents
+
+###
+GET {{baseUrl}}/study-sessions
+
+###
+GET {{baseUrl}}/fitness-sessions
