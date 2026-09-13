@@ -1,0 +1,27 @@
+{
+  "name": "intermediary-mcp",
+  "version": "0.1.0",
+  "description": "MCP server that lets Claude Desktop / Claude Code read your intermediary plan and propose changes for review",
+  "type": "module",
+  "private": true,
+  "bin": {
+    "intermediary-mcp": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/index.js",
+    "dev": "tsx src/index.ts"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.20.0",
+    "zod": "^3.25.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.12.3",
+    "tsx": "^4.20.0",
+    "typescript": "~5.9.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

@@ -39,6 +39,10 @@ public class StudySession {
     @Column(name = "certification_id")
     private Long certificationId;
 
+    /** The plan item this session fulfilled, when logged from one. */
+    @Column(name = "plan_item_id")
+    private Long planItemId;
+
     @Column(name = "notes", length = 2000)
     private String notes;
 

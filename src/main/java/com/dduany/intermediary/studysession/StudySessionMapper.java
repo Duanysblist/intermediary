@@ -14,6 +14,7 @@ public final class StudySessionMapper {
                 .sessionDate(request.getSessionDate())
                 .durationMinutes(request.getDurationMinutes())
                 .certificationId(request.getCertificationId())
+                .planItemId(request.getPlanItemId())
                 .notes(request.getNotes())
                 .build();
     }
@@ -24,6 +25,7 @@ public final class StudySessionMapper {
                 .sessionDate(entity.getSessionDate())
                 .durationMinutes(entity.getDurationMinutes())
                 .certificationId(entity.getCertificationId())
+                .planItemId(entity.getPlanItemId())
                 .notes(entity.getNotes())
                 .createdAt(entity.getCreatedAt())
                 .updatedAt(entity.getUpdatedAt())

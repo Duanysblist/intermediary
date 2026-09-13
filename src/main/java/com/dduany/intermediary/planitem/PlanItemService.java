@@ -63,11 +63,12 @@ public class PlanItemService {
 
         existing.setTitle(request.getTitle());
         existing.setIntent(request.getIntent());
-        existing.setTargetDate(request.getTargetDate() != null ? request.getTargetDate() : existing.getTargetDate());
+        existing.setTargetDate(request.getTargetDate());
         existing.setStatus(request.getStatus() != null ? request.getStatus() : existing.getStatus());
-        existing.setReferenceEntityType(request.getReferenceEntityType() != null ? request.getReferenceEntityType() : existing.getReferenceEntityType());
-        existing.setReferenceEntityId(request.getReferenceEntityId() != null ? request.getReferenceEntityId() : existing.getReferenceEntityId());
-        existing.setNotes(request.getNotes() != null ? request.getNotes() : existing.getNotes());
+        existing.setReferenceEntityType(request.getReferenceEntityType());
+        existing.setReferenceEntityId(request.getReferenceEntityId());
+        existing.setRecurringPlanId(request.getRecurringPlanId());
+        existing.setNotes(request.getNotes());
 
         PlanItem saved = repository.saveAndFlush(existing);
 

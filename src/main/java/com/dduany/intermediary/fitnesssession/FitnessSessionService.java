@@ -50,7 +50,8 @@ public class FitnessSessionService {
         existing.setSessionDate(request.getSessionDate());
         existing.setDurationMinutes(request.getDurationMinutes());
         existing.setWorkoutType(request.getWorkoutType());
-        existing.setNotes(request.getNotes() != null ? request.getNotes() : existing.getNotes());
+        existing.setPlanItemId(request.getPlanItemId());
+        existing.setNotes(request.getNotes());
 
         FitnessSession saved = repository.saveAndFlush(existing);
         return FitnessSessionMapper.toResponse(saved);

@@ -54,12 +54,12 @@ public class ApplicationService {
         existing.setSource(request.getSource());
         existing.setResumeVariant(request.getResumeVariant());
 
-        existing.setLocation(request.getLocation() != null ? request.getLocation() : existing.getLocation());
-        existing.setRequisitionId(request.getRequisitionId() != null ? request.getRequisitionId() : existing.getRequisitionId());
-        existing.setJobUrl(request.getJobUrl() != null ? request.getJobUrl() : existing.getJobUrl());
-        existing.setSalaryRangeMin(request.getSalaryRangeMin() != null ? request.getSalaryRangeMin() : existing.getSalaryRangeMin());
-        existing.setSalaryRangeMax(request.getSalaryRangeMax() != null ? request.getSalaryRangeMax() : existing.getSalaryRangeMax());
-        existing.setNotes(request.getNotes() != null ? request.getNotes() : existing.getNotes());
+        existing.setLocation(request.getLocation());
+        existing.setRequisitionId(request.getRequisitionId());
+        existing.setJobUrl(request.getJobUrl());
+        existing.setSalaryRangeMin(request.getSalaryRangeMin());
+        existing.setSalaryRangeMax(request.getSalaryRangeMax());
+        existing.setNotes(request.getNotes());
 
         Application saved = repository.saveAndFlush(existing);
         return ApplicationMapper.toResponse(saved);

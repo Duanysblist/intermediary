@@ -29,7 +29,7 @@ required.
 - **Feature-based package organization** — each entity is a self-contained module
 - **Containerized**: full stack starts with `docker-compose up`
 
-**Also done:** Testcontainers test suite, validation error handler, OpenAPI docs, JWT sign-in, Claude schedule suggestions.
+**Also done:** Testcontainers test suite, validation error handler, OpenAPI docs, JWT sign-in, Claude schedule suggestions, Flyway migrations, recurring plans, session-to-intention links, proposals inbox, iCalendar feed, MCP server, GitHub Actions CI.
 
 **Phase 2 (in progress):** drag-and-drop frontend is live in [intermediary-frontend](https://github.com/Duanysblist/intermediary-frontend) (React + Vite + Tailwind). Remaining: AWS deployment, microservices split with Kafka.
 
@@ -219,6 +219,30 @@ write in a separate transaction — this is necessary because default
 `REQUIRED` propagation silently fails in the AFTER_COMMIT phase by trying to
 join a closed transaction.
 
+## API Surface
+
+All collections support `GET`, `GET /{id}`, `POST`, `PUT /{id}` (full replacement: a missing or
+null field clears it) and `DELETE /{id}`: `/plan-items`, `/study-sessions`, `/fitness-sessions`,
+`/certifications`, `/applications`, `/documents`, `/recurring-plans`. Plus:
+
+| Endpoint | Purpose |
+|---|---|
+| `GET /plan-events?planItemId=` | Append-only status history (written by the server on every status change). |
+| `POST /recurring-plans/generate?days=14` | Creates plan items for every active routine on matching weekdays; idempotent per routine and date. |
+| `POST /proposals`, `GET /proposals?status=PENDING`, `PUT /proposals/{id}/status` | Change sets from agents, reviewed in the app before anything is applied. |
+| `GET /calendar/link` → `GET /calendar.ics?token=` | iCalendar feed of dated plan items for Google/Apple/Outlook calendar. |
+| `POST /ai/suggest`, `GET /ai/status` | Claude-generated change sets (needs `ANTHROPIC_API_KEY`). |
+| `POST /auth/login`, `GET /auth/me` | JWT sign-in. |
+
+Sessions carry an optional `planItemId` so reality can point back at the intention it fulfilled.
+The schema is managed by Flyway (`src/main/resources/db/migration`); Hibernate only validates it.
+
+## MCP Server
+
+`mcp/` contains a Model Context Protocol server for Claude Desktop and Claude Code. It reads the
+plan and logs sessions directly, and turns any suggested plan changes into a proposal you review
+in the app. Setup in [mcp/README.md](mcp/README.md).
+
 ## Claude Integration
 
 The AI is a client of the API, never part of it. Two paths, both ending in the same review step in the frontend:
@@ -239,8 +263,8 @@ changes go through the ordinary `PUT /plan-items/{id}` and `POST /plan-items`, s
 - **Interactive API docs** via OpenAPI/Swagger (springdoc)
 - **Deployed live** on Render with managed PostgreSQL
 
-**Phase 1 polish** — JUnit + Testcontainers tests: done. `@ControllerAdvice` for validation errors: done. Still to do: GitHub Actions CI.
+**Phase 1 polish** — JUnit + Testcontainers tests, `@ControllerAdvice` for validation errors, Flyway migrations, GitHub Actions CI: done.
 
 **Phase 2 (in progress)** — Drag-and-drop frontend and JWT sign-in: done, see [intermediary-frontend](https://github.com/Duanysblist/intermediary-frontend) (board + week views, sessions, prompt builder). Still to do: AWS deployment (ECS or EKS), microservices split using Kafka for inter-service events.
 
-**Phase 3 (started)** — AI integration: done for schedule suggestions (`POST /ai/suggest` plus the review/import flow in the frontend, see Claude Integration). Next: expose the API as an MCP server, full plan-vs-reality analytics.
+**Phase 3 (in progress)** — AI integration: `POST /ai/suggest` with the review/import flow, an MCP server (`mcp/`) that proposes changes for review, and a weekly plan-vs-reality review in the frontend. Next: richer analytics, multi-user.

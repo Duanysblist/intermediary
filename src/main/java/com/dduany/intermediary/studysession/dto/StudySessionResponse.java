@@ -23,6 +23,8 @@ public class StudySessionResponse {
 
     private Long certificationId;
 
+    private Long planItemId;
+
     private String notes;
 
     private LocalDateTime createdAt;

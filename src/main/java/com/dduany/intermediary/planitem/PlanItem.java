@@ -54,6 +54,10 @@ public class PlanItem {
     @Column(name = "reference_entity_id")
     private Long referenceEntityId;
 
+    /** Set when this item was generated from a recurring plan. */
+    @Column(name = "recurring_plan_id")
+    private Long recurringPlanId;
+
     @Column(name = "notes", length = 2000)
     private String notes;
 

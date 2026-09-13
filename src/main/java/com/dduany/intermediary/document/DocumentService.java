@@ -51,8 +51,8 @@ public class DocumentService {
         existing.setTitle(request.getTitle());
         existing.setPath(request.getPath());
         existing.setType(request.getType() != null ? request.getType() : existing.getType());
-        existing.setVersion(request.getVersion() !=  null ? request.getVersion() : existing.getVersion());
-        existing.setNotes(request.getNotes() != null ? request.getNotes() : existing.getNotes());
+        existing.setVersion(request.getVersion());
+        existing.setNotes(request.getNotes());
 
         Document saved = repository.saveAndFlush(existing);
         return DocumentMapper.toResponse(saved);

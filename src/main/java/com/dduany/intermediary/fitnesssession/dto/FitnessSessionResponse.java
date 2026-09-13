@@ -24,6 +24,8 @@ public class FitnessSessionResponse {
 
     private WorkoutType workoutType;
 
+    private Long planItemId;
+
     private String notes;
 
     private LocalDateTime createdAt;

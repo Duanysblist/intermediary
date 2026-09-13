@@ -39,7 +39,8 @@ public class AiService {
             happened, DEFER or CANCEL items that are clearly stale, add missing preparation steps as new
             items. Keep the number of changes small and high-value; do not rewrite things that are fine.
             Never suggest changing titles unless the current title is unclear. Use only ids that appear
-            in the data. Dates are YYYY-MM-DD; never propose dates in the past.
+            in the data. Dates are YYYY-MM-DD; never propose dates in the past. Set targetDate to the string CLEAR to take an
+            item off the calendar.
             """;
 
     private final AppProperties.Ai config;

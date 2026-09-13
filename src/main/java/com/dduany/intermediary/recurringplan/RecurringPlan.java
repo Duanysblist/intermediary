@@ -1,6 +1,9 @@
-package com.dduany.intermediary.fitnesssession;
+package com.dduany.intermediary.recurringplan;
 
+import com.dduany.intermediary.planitem.PlanIntent;
+import com.dduany.intermediary.planitem.ReferenceEntityType;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -16,38 +19,50 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.time.DayOfWeek;
 import java.time.LocalDateTime;
+import java.util.List;
 
+/**
+ * A routine: "Workout B every Monday, Wednesday and Friday". Generation turns it into ordinary
+ * plan items (one per matching day), which then live their own life on the board.
+ */
 @Entity
-@Table(name = "fitness_sessions")
+@Table(name = "recurring_plans")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class FitnessSession {
+public class RecurringPlan {
 
-    // Primary key
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "session_date", nullable = false)
-    private LocalDateTime sessionDate;
-
-    @Column(name = "duration_minutes", nullable = false)
-    private Integer durationMinutes;
+    @Column(name = "title", nullable = false)
+    private String title;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "workout_type", nullable = false)
-    private WorkoutType workoutType;
+    @Column(name = "intent", nullable = false)
+    private PlanIntent intent;
 
-    /** The plan item this session fulfilled, when logged from one. */
-    @Column(name = "plan_item_id")
-    private Long planItemId;
+    @Convert(converter = DayOfWeekListConverter.class)
+    @Column(name = "days", nullable = false)
+    private List<DayOfWeek> days;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "reference_entity_type")
+    private ReferenceEntityType referenceEntityType;
+
+    @Column(name = "reference_entity_id")
+    private Long referenceEntityId;
 
     @Column(name = "notes", length = 2000)
     private String notes;
+
+    @Column(name = "active", nullable = false)
+    private boolean active;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)

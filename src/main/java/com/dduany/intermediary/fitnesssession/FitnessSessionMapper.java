@@ -14,6 +14,7 @@ public final class FitnessSessionMapper {
                 .sessionDate(request.getSessionDate())
                 .durationMinutes(request.getDurationMinutes())
                 .workoutType(request.getWorkoutType())
+                .planItemId(request.getPlanItemId())
                 .notes(request.getNotes())
                 .build();
     }
@@ -24,6 +25,7 @@ public final class FitnessSessionMapper {
                 .sessionDate(entity.getSessionDate())
                 .durationMinutes(entity.getDurationMinutes())
                 .workoutType(entity.getWorkoutType())
+                .planItemId(entity.getPlanItemId())
                 .notes(entity.getNotes())
                 .createdAt(entity.getCreatedAt())
                 .updatedAt(entity.getUpdatedAt())

@@ -1,38 +1,36 @@
-package com.dduany.intermediary.planitem;
+package com.dduany.intermediary.recurringplan;
 
-import com.dduany.intermediary.planitem.dto.PlanItemRequest;
-import com.dduany.intermediary.planitem.dto.PlanItemResponse;
+import com.dduany.intermediary.recurringplan.dto.RecurringPlanRequest;
+import com.dduany.intermediary.recurringplan.dto.RecurringPlanResponse;
 
-public final class PlanItemMapper {
+public final class RecurringPlanMapper {
 
-    private PlanItemMapper() {
+    private RecurringPlanMapper() {
         // utility class - prevent instantiation
     }
 
-    public static PlanItem toEntity(PlanItemRequest request){
-        return PlanItem.builder()
+    public static RecurringPlan toEntity(RecurringPlanRequest request) {
+        return RecurringPlan.builder()
                 .title(request.getTitle())
                 .intent(request.getIntent())
-                .targetDate(request.getTargetDate())
-                .status(request.getStatus())
+                .days(request.getDays())
                 .referenceEntityType(request.getReferenceEntityType())
                 .referenceEntityId(request.getReferenceEntityId())
-                .recurringPlanId(request.getRecurringPlanId())
                 .notes(request.getNotes())
+                .active(request.getActive() == null || request.getActive())
                 .build();
     }
 
-    public static PlanItemResponse toResponse(PlanItem entity){
-        return PlanItemResponse.builder()
+    public static RecurringPlanResponse toResponse(RecurringPlan entity) {
+        return RecurringPlanResponse.builder()
                 .id(entity.getId())
                 .title(entity.getTitle())
                 .intent(entity.getIntent())
-                .targetDate(entity.getTargetDate())
-                .status(entity.getStatus())
+                .days(entity.getDays())
                 .referenceEntityType(entity.getReferenceEntityType())
                 .referenceEntityId(entity.getReferenceEntityId())
-                .recurringPlanId(entity.getRecurringPlanId())
                 .notes(entity.getNotes())
+                .active(entity.isActive())
                 .createdAt(entity.getCreatedAt())
                 .updatedAt(entity.getUpdatedAt())
                 .build();

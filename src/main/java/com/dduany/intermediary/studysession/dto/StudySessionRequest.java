@@ -27,6 +27,8 @@ public class StudySessionRequest {
 
     private Long certificationId;
 
+    private Long planItemId;
+
     @Size(max = 2000, message = "Notes must be 2000 characters or fewer")
     private String notes;
 }

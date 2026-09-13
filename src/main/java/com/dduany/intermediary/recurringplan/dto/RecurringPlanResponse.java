@@ -1,7 +1,6 @@
-package com.dduany.intermediary.planitem.dto;
+package com.dduany.intermediary.recurringplan.dto;
 
 import com.dduany.intermediary.planitem.PlanIntent;
-import com.dduany.intermediary.planitem.PlanItemStatus;
 import com.dduany.intermediary.planitem.ReferenceEntityType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,35 +8,24 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDate;
+import java.time.DayOfWeek;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class PlanItemResponse {
-
+public class RecurringPlanResponse {
     private Long id;
-
     private String title;
-
     private PlanIntent intent;
-
-    private LocalDate targetDate;
-
-    private PlanItemStatus status;
-
+    private List<DayOfWeek> days;
     private ReferenceEntityType referenceEntityType;
-
     private Long referenceEntityId;
-
-    private Long recurringPlanId;
-
     private String notes;
-
+    private boolean active;
     private LocalDateTime createdAt;
-
     private LocalDateTime updatedAt;
 }

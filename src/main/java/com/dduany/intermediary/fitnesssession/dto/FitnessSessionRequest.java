@@ -29,6 +29,8 @@ public class FitnessSessionRequest {
     @NotNull(message = "Workout type is required")
     private WorkoutType workoutType;
 
+    private Long planItemId;
+
     @Size(max = 2000, message = "Notes must be 2000 characters or fewer")
     private String notes;
 

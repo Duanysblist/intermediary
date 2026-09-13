@@ -1,4 +1,4 @@
-package com.dduany.intermediary.fitnesssession;
+package com.dduany.intermediary.proposal;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -18,36 +18,35 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
+/**
+ * A change set waiting for a human. Agents (the MCP server, scripts) propose; the app applies.
+ * The changes are stored as the JSON contract shared with the frontend and AiService.
+ */
 @Entity
-@Table(name = "fitness_sessions")
+@Table(name = "proposals")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class FitnessSession {
+public class Proposal {
 
-    // Primary key
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "session_date", nullable = false)
-    private LocalDateTime sessionDate;
+    @Column(name = "source", nullable = false)
+    private String source;
 
-    @Column(name = "duration_minutes", nullable = false)
-    private Integer durationMinutes;
+    @Column(name = "summary", length = 2000)
+    private String summary;
+
+    @Column(name = "changes_json", nullable = false, columnDefinition = "TEXT")
+    private String changesJson;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "workout_type", nullable = false)
-    private WorkoutType workoutType;
-
-    /** The plan item this session fulfilled, when logged from one. */
-    @Column(name = "plan_item_id")
-    private Long planItemId;
-
-    @Column(name = "notes", length = 2000)
-    private String notes;
+    @Column(name = "status", nullable = false)
+    private ProposalStatus status;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)

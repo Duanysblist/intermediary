@@ -1,9 +1,9 @@
-package com.dduany.intermediary.planitem.dto;
+package com.dduany.intermediary.recurringplan.dto;
 
 import com.dduany.intermediary.planitem.PlanIntent;
-import com.dduany.intermediary.planitem.PlanItemStatus;
 import com.dduany.intermediary.planitem.ReferenceEntityType;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -12,32 +12,32 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDate;
+import java.time.DayOfWeek;
+import java.util.List;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class PlanItemRequest {
+public class RecurringPlanRequest {
 
     @NotBlank(message = "Title is required")
     @Size(max = 200, message = "Title must be 200 characters or fewer")
     private String title;
 
-    @NotNull(message = "PlanIntent is required")
+    @NotNull(message = "Intent is required")
     private PlanIntent intent;
 
-    private LocalDate targetDate;
-
-    private PlanItemStatus status;
+    @NotEmpty(message = "Pick at least one day")
+    private List<DayOfWeek> days;
 
     private ReferenceEntityType referenceEntityType;
 
     private Long referenceEntityId;
 
-    private Long recurringPlanId;
-
     @Size(max = 2000, message = "Notes must be 2000 characters or fewer")
     private String notes;
+
+    private Boolean active;
 }

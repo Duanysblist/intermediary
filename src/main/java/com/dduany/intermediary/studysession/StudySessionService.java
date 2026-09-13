@@ -52,8 +52,9 @@ public class StudySessionService {
 
         existing.setSessionDate(request.getSessionDate());
         existing.setDurationMinutes(request.getDurationMinutes());
-        existing.setCertificationId(request.getCertificationId() != null ? request.getCertificationId() : existing.getCertificationId());
-        existing.setNotes(request.getNotes() != null ? request.getNotes(): existing.getNotes());
+        existing.setCertificationId(request.getCertificationId());
+        existing.setPlanItemId(request.getPlanItemId());
+        existing.setNotes(request.getNotes());
 
         StudySession saved = repository.saveAndFlush(existing);
         return StudySessionMapper.toResponse(saved);

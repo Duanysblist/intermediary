@@ -1,5 +1,6 @@
 package com.dduany.intermediary.ai.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 
 import java.util.List;
@@ -8,6 +9,7 @@ import java.util.List;
  * The contract for schedule suggestions coming back from Claude (or pasted in by hand).
  * The frontend renders each change for review; nothing is applied without the user accepting it.
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public record ChangeSet(
         @JsonPropertyDescription("One or two sentences explaining the overall recommendation.")
         String summary,
@@ -15,6 +17,7 @@ public record ChangeSet(
         List<Change> changes
 ) {
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public record Change(
             @JsonPropertyDescription("\"update\" for an existing plan item (id required) or \"create\" for a new one (id null).")
             String op,
@@ -26,6 +29,8 @@ public record ChangeSet(
             String reason
     ) {}
 
+    /** Null means "leave unchanged". To clear a target date, send the string CLEAR. */
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public record PlanItemFields(
             @JsonPropertyDescription("Plan item title. Null to leave unchanged.")
             String title,
@@ -33,7 +38,7 @@ public record ChangeSet(
             String intent,
             @JsonPropertyDescription("One of PLANNED, IN_PROGRESS, DONE, DEFERRED, CANCELED. Null to leave unchanged.")
             String status,
-            @JsonPropertyDescription("Target date as YYYY-MM-DD. Null to leave unchanged. Dates cannot be cleared, only moved.")
+            @JsonPropertyDescription("Target date as YYYY-MM-DD to move the item, the literal string CLEAR to take it off the calendar, or null to leave unchanged.")
             String targetDate,
             @JsonPropertyDescription("Notes text. Null to leave unchanged.")
             String notes

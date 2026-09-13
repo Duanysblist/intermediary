@@ -73,6 +73,21 @@ public class SecurityConfig {
 
     public record LoginPassword(String value) {}
 
+    /** Token for the iCalendar feed URL, derived from the JWT secret so it is stable while the secret is. */
+    @Bean
+    CalendarToken calendarToken() {
+        try {
+            javax.crypto.Mac mac = javax.crypto.Mac.getInstance("HmacSHA256");
+            mac.init(secretKey);
+            byte[] digest = mac.doFinal("calendar-feed".getBytes(StandardCharsets.UTF_8));
+            return new CalendarToken(Base64.getUrlEncoder().withoutPadding().encodeToString(digest));
+        } catch (java.security.GeneralSecurityException e) {
+            throw new IllegalStateException("Cannot derive calendar token", e);
+        }
+    }
+
+    public record CalendarToken(String value) {}
+
     static String randomToken(int bytes) {
         byte[] buf = new byte[bytes];
         new SecureRandom().nextBytes(buf);
@@ -89,7 +104,7 @@ public class SecurityConfig {
                 .formLogin(f -> f.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("/auth/login", "/error").permitAll()
+                        .requestMatchers("/auth/login", "/error", "/calendar.ics").permitAll()
                         .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(o -> o.jwt(Customizer.withDefaults()));
