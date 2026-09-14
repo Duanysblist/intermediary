@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 
 @Service
@@ -30,7 +30,7 @@ public class PlanEventService {
                     .planItemId(planItemId)
                     .fromStatus(fromStatus)
                     .toStatus(toStatus)
-                    .eventTime(LocalDateTime.now())
+                    .eventTime(Instant.now())
                     .notes(notes)
                     .build();
 

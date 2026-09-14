@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Entity
 @Table(name = "plan_events")
@@ -43,14 +43,14 @@ public class PlanEvent {
     private PlanItemStatus toStatus;
 
     @Column(name = "event_time", nullable = false)
-    private LocalDateTime eventTime;
+    private Instant eventTime;
 
     @Column(name = "notes", length = 2000)
     private String notes;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 
     // No @UpdateTimestamp — events are immutable.
     // No updatedAt field — append-only audit log.

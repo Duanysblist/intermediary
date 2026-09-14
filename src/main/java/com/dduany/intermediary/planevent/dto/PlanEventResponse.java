@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Getter
 @Setter
@@ -24,10 +24,10 @@ public class PlanEventResponse {
 
     private PlanItemStatus toStatus;
 
-    private LocalDateTime eventTime;
+    private Instant eventTime;
 
     private String notes;
 
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 
 }

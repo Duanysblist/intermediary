@@ -1,5 +1,6 @@
 package com.dduany.intermediary;
 
+import com.dduany.intermediary.config.AppProperties;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,6 +17,7 @@ import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.endsWith;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -31,6 +33,7 @@ class FeaturesTest {
 
     @Autowired MockMvc mvc;
     @Autowired ObjectMapper json;
+    @Autowired AppProperties props;
 
     String bearer;
 
@@ -46,7 +49,10 @@ class FeaturesTest {
     void putReplacesTheRecordSoADateCanBeCleared() throws Exception {
         String created = mvc.perform(post("/plan-items").header("Authorization", bearer).contentType(MediaType.APPLICATION_JSON)
                         .content("{\"title\":\"Dated\",\"intent\":\"READ\",\"targetDate\":\"2030-01-05\",\"notes\":\"keep\"}"))
-                .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString();
+                .andExpect(status().isCreated())
+                // Server-set timestamps are UTC instants, so every client can convert them to its own zone.
+                .andExpect(jsonPath("$.createdAt").value(endsWith("Z")))
+                .andReturn().getResponse().getContentAsString();
         long id = json.readTree(created).get("id").asLong();
 
         mvc.perform(put("/plan-items/" + id).header("Authorization", bearer).contentType(MediaType.APPLICATION_JSON)
@@ -58,7 +64,9 @@ class FeaturesTest {
 
     @Test
     void recurringPlanGeneratesOneItemPerMatchingDayAndIsIdempotent() throws Exception {
-        DayOfWeek tomorrow = LocalDate.now().plusDays(1).getDayOfWeek();
+        // "Today" on the server is in the configured app zone, not the JVM default.
+        LocalDate tomorrowDate = LocalDate.now(props.zone()).plusDays(1);
+        DayOfWeek tomorrow = tomorrowDate.getDayOfWeek();
         String plan = mvc.perform(post("/recurring-plans").header("Authorization", bearer).contentType(MediaType.APPLICATION_JSON)
                         .content("{\"title\":\"Routine\",\"intent\":\"EXERCISE\",\"days\":[\"" + tomorrow + "\"]}"))
                 .andExpect(status().isCreated())
@@ -74,7 +82,7 @@ class FeaturesTest {
         assertThat(mine).isEqualTo(1);
         for (JsonNode n : items) {
             if (n.get("recurringPlanId").asLong() == planId) {
-                assertThat(n.get("targetDate").asText()).isEqualTo(LocalDate.now().plusDays(1).toString());
+                assertThat(n.get("targetDate").asText()).isEqualTo(tomorrowDate.toString());
             }
         }
 

@@ -1,5 +1,6 @@
 package com.dduany.intermediary.recurringplan;
 
+import com.dduany.intermediary.config.AppProperties;
 import com.dduany.intermediary.exception.ResourceNotFoundException;
 import com.dduany.intermediary.planitem.PlanItemRepository;
 import com.dduany.intermediary.planitem.PlanItemService;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,11 +23,13 @@ public class RecurringPlanService {
     private final RecurringPlanRepository repository;
     private final PlanItemRepository planItemRepository;
     private final PlanItemService planItemService;
+    private final ZoneId zone;
 
-    public RecurringPlanService(RecurringPlanRepository repository, PlanItemRepository planItemRepository, PlanItemService planItemService) {
+    public RecurringPlanService(RecurringPlanRepository repository, PlanItemRepository planItemRepository, PlanItemService planItemService, AppProperties props) {
         this.repository = repository;
         this.planItemRepository = planItemRepository;
         this.planItemService = planItemService;
+        this.zone = props.zone();
     }
 
     @Transactional
@@ -71,7 +75,7 @@ public class RecurringPlanService {
     @Transactional
     public List<PlanItemResponse> generate(int days) {
         int horizon = Math.max(0, Math.min(days, 60));
-        LocalDate today = LocalDate.now();
+        LocalDate today = LocalDate.now(zone);
         List<PlanItemResponse> created = new ArrayList<>();
         for (RecurringPlan plan : repository.findByActiveTrue()) {
             for (int offset = 0; offset <= horizon; offset++) {

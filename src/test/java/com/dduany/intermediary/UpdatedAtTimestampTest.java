@@ -32,6 +32,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 
 import java.time.LocalDate;
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -197,7 +198,7 @@ class UpdatedAtTimestampTest {
 		}
 	}
 
-	private static void assertUpdatedAfterCreated(LocalDateTime createdAt, LocalDateTime updatedAt, String source) {
+	private static void assertUpdatedAfterCreated(Instant createdAt, Instant updatedAt, String source) {
 		assertThat(createdAt).as("%s createdAt", source).isNotNull();
 		assertThat(updatedAt).as("%s updatedAt", source).isNotNull();
 		assertThat(updatedAt)

@@ -18,7 +18,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.security.MessageDigest;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
@@ -87,8 +87,8 @@ public class CalendarController {
                 .body(ics.toString());
     }
 
-    private static String stamp(LocalDateTime t) {
-        return (t == null ? LocalDateTime.now() : t).atOffset(ZoneOffset.UTC).format(STAMP);
+    private static String stamp(Instant t) {
+        return (t == null ? Instant.now() : t).atOffset(ZoneOffset.UTC).format(STAMP);
     }
 
     /** RFC 5545 text escaping. */

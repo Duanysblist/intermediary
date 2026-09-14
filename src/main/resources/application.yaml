@@ -22,6 +22,8 @@ spring:
     properties:
       hibernate:
         format_sql: true
+        # Instants are stored as UTC regardless of the server clock, so timestamps mean the same thing everywhere.
+        timezone.default_storage: NORMALIZE_UTC
     open-in-view: false
 
 logging:
@@ -37,6 +39,8 @@ server:
 # Deployment settings. Defaults are for local development only; set the
 # environment variables in production (see README "Deploying").
 app:
+  # Your local zone. Used for "today" on the server, e.g. which day a routine generates from.
+  timezone: ${APP_TIMEZONE:America/New_York}
   auth:
     username: ${APP_USERNAME:dev}
     # Leave APP_PASSWORD unset and a random password is generated and printed in the log at startup.
