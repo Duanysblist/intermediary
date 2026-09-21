@@ -6,7 +6,7 @@ review in the app before anything is applied.
 
 | Tool | What it does |
 |---|---|
-| `get_plan_overview` | Snapshot: open plan items, recent sessions and events, certifications, active applications. |
+| `get_plan_overview` | Snapshot: open plan items, items closed in the recent window, recent sessions and events (each naming its plan item), certifications, active applications. |
 | `list_plan_items` | All plan items (optionally by status), for ids. |
 | `propose_plan_changes` | Submits a change set (`update` / `create`, same JSON contract as the app). Lands in the app's Prompt page inbox. |
 | `log_study_session` / `log_fitness_session` | Records reality directly, optionally linked to a plan item. |

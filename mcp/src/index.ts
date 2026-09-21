@@ -90,7 +90,8 @@ server.registerTool(
         title: 'Plan overview',
         description:
             'A compact snapshot of the plan: open plan items (intentions with status and target date), ' +
-            'recent study and fitness sessions (reality), certifications with exam dates, and active applications. ' +
+            'plan items closed in the recent window (with closedAt), recent study and fitness sessions (reality), ' +
+            'certifications with exam dates, and active applications. Events and sessions carry a derived planItemTitle. ' +
             'Call this first before proposing anything.',
         inputSchema: { days: z.number().int().min(1).max(90).default(14).describe('How many past days of sessions and events to include') },
     },
@@ -98,20 +99,31 @@ server.registerTool(
         const since = new Date(Date.now() - days * 86_400_000).toISOString().slice(0, 10)
         const [items, study, fitness, certs, apps, events] = await Promise.all([
             api<PlanItem[]>('/plan-items'),
-            api<{ sessionDate: string }[]>('/study-sessions'),
-            api<{ sessionDate: string }[]>('/fitness-sessions'),
+            api<{ sessionDate: string; planItemId: number | null }[]>('/study-sessions'),
+            api<{ sessionDate: string; planItemId: number | null }[]>('/fitness-sessions'),
             api<{ status: string }[]>('/certifications'),
             api<{ status: string }[]>('/applications'),
-            api<{ eventTime: string }[]>('/plan-events'),
+            api<{ eventTime: string; planItemId: number }[]>('/plan-events'),
         ])
         const strip = <T extends object>(rows: T[]) => rows.map((r) => { const c = { ...r } as Record<string, unknown>; delete c.createdAt; delete c.updatedAt; return c })
+        const isOpen = (p: PlanItem) => p.status === 'PLANNED' || p.status === 'IN_PROGRESS'
+        // Items have no closedAt column; the last status event says when they closed.
+        const closedAt = new Map<number, string>()
+        for (const e of events) if ((closedAt.get(e.planItemId) ?? '') < e.eventTime) closedAt.set(e.planItemId, e.eventTime)
+        const titles = new Map(items.map((p) => [p.id, p.title]))
+        // A row that only says "item 42 became DONE" is useless to an agent that never saw item 42.
+        const named = <T extends { planItemId: number | null }>(rows: T[]) =>
+            strip(rows).map((r, i) => (rows[i].planItemId == null ? r : { ...r, planItemTitle: titles.get(rows[i].planItemId!) ?? '(deleted item)' }))
+        const closed = items.filter((p) => !isOpen(p) && (closedAt.get(p.id) ?? p.updatedAt) >= since)
+            .sort((a, b) => (closedAt.get(b.id) ?? b.updatedAt).localeCompare(closedAt.get(a.id) ?? a.updatedAt))
         return text({
             today: new Date().toISOString().slice(0, 10),
-            openPlanItems: strip(items.filter((p) => p.status === 'PLANNED' || p.status === 'IN_PROGRESS')),
-            closedPlanItemsCount: items.length - items.filter((p) => p.status === 'PLANNED' || p.status === 'IN_PROGRESS').length,
-            studySessions: strip(study.filter((s) => s.sessionDate >= since)),
-            fitnessSessions: strip(fitness.filter((s) => s.sessionDate >= since)),
-            planEvents: strip(events.filter((e) => e.eventTime >= since)),
+            openPlanItems: strip(items.filter(isOpen)),
+            recentlyClosedPlanItems: strip(closed).map((c, i) => ({ ...c, closedAt: closedAt.get(closed[i].id) ?? closed[i].updatedAt })),
+            closedPlanItemsCount: items.length - items.filter(isOpen).length,
+            studySessions: named(study.filter((s) => s.sessionDate >= since)),
+            fitnessSessions: named(fitness.filter((s) => s.sessionDate >= since)),
+            planEvents: named(events.filter((e) => e.eventTime >= since)),
             certifications: strip(certs),
             applications: strip(apps.filter((a) => !['REJECTED', 'WITHDRAWN', 'GHOSTED'].includes(a.status))),
         })
