@@ -1,7 +1,7 @@
 package com.dduany.intermediary.ai;
 
-import com.dduany.intermediary.ai.dto.ChangeSet;
 import com.dduany.intermediary.ai.dto.SuggestRequest;
+import com.dduany.intermediary.ai.dto.SuggestResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -33,8 +33,8 @@ public class AiController {
     }
 
     @PostMapping("/suggest")
-    @Operation(summary = "Ask Claude for plan changes given a context block; nothing is applied server-side")
-    public ChangeSet suggest(@Valid @RequestBody SuggestRequest request) {
+    @Operation(summary = "Ask Claude for plan changes given a context block; the answer is saved as a pending proposal, nothing is applied server-side")
+    public SuggestResponse suggest(@Valid @RequestBody SuggestRequest request) {
         return aiService.suggest(request.getContext(), request.getRequest());
     }
 }

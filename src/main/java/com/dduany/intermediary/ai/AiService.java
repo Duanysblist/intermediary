@@ -9,7 +9,11 @@ import com.anthropic.models.messages.StructuredMessage;
 import com.anthropic.models.messages.StructuredMessageCreateParams;
 import com.anthropic.models.messages.ThinkingConfigAdaptive;
 import com.dduany.intermediary.ai.dto.ChangeSet;
+import com.dduany.intermediary.ai.dto.SuggestResponse;
 import com.dduany.intermediary.config.AppProperties;
+import com.dduany.intermediary.proposal.ProposalService;
+import com.dduany.intermediary.proposal.dto.ProposalRequest;
+import com.dduany.intermediary.proposal.dto.ProposalResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -21,7 +25,8 @@ import java.util.List;
 /**
  * Asks Claude for schedule changes given the same context block the Prompt page builds.
  * The response is constrained to the {@link ChangeSet} schema via structured outputs, so the
- * frontend can render it for review without parsing prose.
+ * frontend can render it for review without parsing prose. Every answer is also stored as a
+ * pending proposal, so a client that drops the connection mid-request can pick it up from the inbox.
  */
 @Service
 public class AiService {
@@ -43,11 +48,16 @@ public class AiService {
             item off the calendar.
             """;
 
+    /** Proposal source prefix for answers to the app's own "Ask Claude"; the UI renders it as "Claude (model)". */
+    public static final String SOURCE_PREFIX = "ai:";
+
     private final AppProperties.Ai config;
     private final AnthropicClient client;
+    private final ProposalService proposals;
 
-    public AiService(AppProperties props) {
+    public AiService(AppProperties props, ProposalService proposals) {
         this.config = props.ai();
+        this.proposals = proposals;
         this.client = config.enabled() ? AnthropicOkHttpClient.builder().apiKey(config.apiKey()).build() : null;
         if (!config.enabled()) {
             log.info("ANTHROPIC_API_KEY not set; POST /ai/suggest is disabled");
@@ -62,7 +72,14 @@ public class AiService {
         return config.model();
     }
 
-    public ChangeSet suggest(String context, String request) {
+    public SuggestResponse suggest(String context, String request) {
+        ChangeSet changeSet = ask(context, request);
+        String summary = changeSet.summary() == null ? null : changeSet.summary().substring(0, Math.min(changeSet.summary().length(), 2000));
+        ProposalResponse saved = proposals.create(new ProposalRequest(SOURCE_PREFIX + config.model(), summary, changeSet.changes()));
+        return new SuggestResponse(saved.id(), changeSet.summary(), changeSet.changes());
+    }
+
+    private ChangeSet ask(String context, String request) {
         if (!isEnabled()) {
             throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE,
                     "AI suggestions are not configured on this server (ANTHROPIC_API_KEY is not set).");
