@@ -2,7 +2,6 @@ package com.dduany.intermediary.application.dto;
 
 import com.dduany.intermediary.application.ApplicationSource;
 import com.dduany.intermediary.application.ApplicationStatus;
-import com.dduany.intermediary.application.ResumeVariant;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -31,7 +30,7 @@ public class ApplicationResponse {
 
     private ApplicationSource source;
 
-    private ResumeVariant resumeVariant;
+    private String resumeFile;
 
     private String location;
 
@@ -44,6 +43,12 @@ public class ApplicationResponse {
     private Integer salaryRangeMax;
 
     private String notes;
+
+    private String contactName;
+
+    private LocalDate nextActionDate;
+
+    private Instant interviewAt;
 
     private Instant createdAt;
 

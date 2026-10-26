@@ -214,5 +214,42 @@ server.registerTool(
     async () => text(await api('/proposals?status=PENDING')),
 )
 
+server.registerTool(
+    'log_application',
+    {
+        title: 'Log a job application',
+        description:
+            'Record a job application that actually happened (reality, like a session). Put the person to follow up with in ' +
+            'contactName and the next step in nextActionDate so the Sunday review can flag it. Check get_plan_overview first ' +
+            'so you do not log the same application twice.',
+        inputSchema: {
+            company: z.string().min(1).max(200),
+            role: z.string().min(1).max(200),
+            applicationDate: IsoDate,
+            status: z.enum(['APPLIED', 'SCREENING', 'INTERVIEWING', 'OFFER', 'REJECTED', 'WITHDRAWN', 'GHOSTED']).default('APPLIED'),
+            source: z.enum(['COLD', 'REFERRAL', 'RECRUITER', 'EVENT', 'INTERNAL']).default('COLD'),
+            resumeFile: z.string().min(1).max(200).describe('Name of the resume file that was sent, e.g. "Daniel_Duany_Resume_MASTER"'),
+            contactName: z.string().max(200).optional(),
+            nextActionDate: IsoDate.optional(),
+            interviewAt: z.string().datetime().optional().describe('UTC instant, e.g. 2026-11-02T19:30:00Z'),
+            location: z.string().max(200).optional(),
+            jobUrl: z.string().max(500).optional(),
+            notes: z.string().max(2000).optional(),
+        },
+    },
+    async (input) => text(await api('/applications', {
+        method: 'POST',
+        body: JSON.stringify({
+            ...input,
+            contactName: input.contactName ?? null,
+            nextActionDate: input.nextActionDate ?? null,
+            interviewAt: input.interviewAt ?? null,
+            location: input.location ?? null,
+            jobUrl: input.jobUrl ?? null,
+            notes: input.notes ?? null,
+        }),
+    })),
+)
+
 const transport = new StdioServerTransport()
 await server.connect(transport)

@@ -42,9 +42,8 @@ public class Application {
     @Column(name = "source", nullable = false)
     private ApplicationSource source;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "resume_variant", nullable = false)
-    private ResumeVariant resumeVariant;
+    @Column(name = "resume_file", nullable = false, length = 200)
+    private String resumeFile;
 
     @Column(name = "location")
     private String location;
@@ -65,6 +64,15 @@ public class Application {
 
     @Column(name = "notes", length = 2000)
     private String notes;
+
+    @Column(name = "contact_name", length = 200)
+    private String contactName;
+
+    @Column(name = "next_action_date")
+    private LocalDate nextActionDate;
+
+    @Column(name = "interview_at")
+    private Instant interviewAt;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)

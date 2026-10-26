@@ -3,7 +3,6 @@ package com.dduany.intermediary;
 import com.dduany.intermediary.application.ApplicationService;
 import com.dduany.intermediary.application.ApplicationSource;
 import com.dduany.intermediary.application.ApplicationStatus;
-import com.dduany.intermediary.application.ResumeVariant;
 import com.dduany.intermediary.application.dto.ApplicationRequest;
 import com.dduany.intermediary.application.dto.ApplicationResponse;
 import com.dduany.intermediary.certification.CertificationService;
@@ -94,7 +93,7 @@ class UpdatedAtTimestampTest {
 				.applicationDate(LocalDate.of(2026, 9, 1))
 				.status(ApplicationStatus.APPLIED)
 				.source(ApplicationSource.COLD)
-				.resumeVariant(ResumeVariant.VARIANT_A_DEFENSE)
+				.resumeFile("Variant A - Defense")
 				.build();
 		ApplicationResponse created = applicationService.create(request);
 		try {

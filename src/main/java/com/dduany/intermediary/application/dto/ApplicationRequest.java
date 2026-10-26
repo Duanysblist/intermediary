@@ -2,7 +2,6 @@ package com.dduany.intermediary.application.dto;
 
 import com.dduany.intermediary.application.ApplicationSource;
 import com.dduany.intermediary.application.ApplicationStatus;
-import com.dduany.intermediary.application.ResumeVariant;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
@@ -13,6 +12,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.Instant;
 import java.time.LocalDate;
 
 @Getter
@@ -39,8 +39,9 @@ public class ApplicationRequest {
     @NotNull(message = "Source is required")
     private ApplicationSource source;
 
-    @NotNull(message = "Resume variant is required")
-    private ResumeVariant resumeVariant;
+    @NotBlank(message = "Resume file is required")
+    @Size(max = 200, message = "Resume file must be 200 characters or fewer")
+    private String resumeFile;
 
     @Size(max = 200, message = "Location must be 200 characters or fewer")
     private String location;
@@ -59,4 +60,11 @@ public class ApplicationRequest {
 
     @Size(max = 2000, message = "Notes must be 2000 characters or fewer")
     private String notes;
+
+    @Size(max = 200, message = "Contact name must be 200 characters or fewer")
+    private String contactName;
+
+    private LocalDate nextActionDate;
+
+    private Instant interviewAt;
 }

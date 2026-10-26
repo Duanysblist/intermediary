@@ -52,7 +52,7 @@ public class ApplicationService {
         existing.setApplicationDate(request.getApplicationDate());
         existing.setStatus(request.getStatus());
         existing.setSource(request.getSource());
-        existing.setResumeVariant(request.getResumeVariant());
+        existing.setResumeFile(request.getResumeFile());
 
         existing.setLocation(request.getLocation());
         existing.setRequisitionId(request.getRequisitionId());
@@ -60,6 +60,9 @@ public class ApplicationService {
         existing.setSalaryRangeMin(request.getSalaryRangeMin());
         existing.setSalaryRangeMax(request.getSalaryRangeMax());
         existing.setNotes(request.getNotes());
+        existing.setContactName(request.getContactName());
+        existing.setNextActionDate(request.getNextActionDate());
+        existing.setInterviewAt(request.getInterviewAt());
 
         Application saved = repository.saveAndFlush(existing);
         return ApplicationMapper.toResponse(saved);

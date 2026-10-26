@@ -10,6 +10,7 @@ review in the app before anything is applied.
 | `list_plan_items` | All plan items (optionally by status), for ids. |
 | `propose_plan_changes` | Submits a change set (`update` / `create`, same JSON contract as the app). Lands in the app's Prompt page inbox. |
 | `log_study_session` / `log_fitness_session` | Records reality directly, optionally linked to a plan item. |
+| `log_application` | Records a job application directly: company, role, status, source, the resume file sent, and optionally a contact, next action date and interview time. |
 | `list_pending_proposals` | What's already waiting, to avoid duplicates. |
 
 ## Setup
