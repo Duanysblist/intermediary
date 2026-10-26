@@ -10,6 +10,7 @@
       <env name="APP_USERNAME" value="dev" />
       <env name="APP_PASSWORD" value="dev" />
       <env name="APP_JWT_SECRET" value="dev-only-secret-change-me-in-production-0123456789" />
+      <env name="SPRING_JPA_SHOW_SQL" value="true" />
     </envs>
     <module name="intermediary" />
     <option name="SPRING_BOOT_MAIN_CLASS" value="com.dduany.intermediary.IntermediaryApplication" />

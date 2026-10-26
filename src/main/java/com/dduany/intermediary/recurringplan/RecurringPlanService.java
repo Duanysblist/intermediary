@@ -16,6 +16,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class RecurringPlanService {
@@ -50,6 +51,8 @@ public class RecurringPlanService {
     @Transactional
     public RecurringPlanResponse update(Long id, RecurringPlanRequest request) {
         RecurringPlan existing = get(id);
+        boolean rescheduled = !Objects.equals(existing.getDays(), request.getDays())
+                || (request.getActive() != null && request.getActive() != existing.isActive());
         existing.setTitle(request.getTitle());
         existing.setIntent(request.getIntent());
         existing.setDays(request.getDays());
@@ -57,6 +60,8 @@ public class RecurringPlanService {
         existing.setReferenceEntityId(request.getReferenceEntityId());
         existing.setNotes(request.getNotes());
         if (request.getActive() != null) existing.setActive(request.getActive());
+        // A changed schedule should generate again, even for dates it had already covered.
+        if (rescheduled) existing.setGeneratedThrough(null);
         return RecurringPlanMapper.toResponse(repository.saveAndFlush(existing));
     }
 
@@ -69,17 +74,17 @@ public class RecurringPlanService {
 
     /**
      * Creates plan items for every active routine on each matching day from today through
-     * today + {@code days}. Idempotent: a routine gets at most one item per date, so this can run
-     * as often as the user likes.
+     * today + {@code days}. Idempotent: each routine resumes after the last date it generated, so
+     * items the user deleted or moved stay that way, and a routine gets at most one item per date.
      */
     @Transactional
     public List<PlanItemResponse> generate(int days) {
         int horizon = Math.max(0, Math.min(days, 60));
         LocalDate today = LocalDate.now(zone);
+        LocalDate through = today.plusDays(horizon);
         List<PlanItemResponse> created = new ArrayList<>();
         for (RecurringPlan plan : repository.findByActiveTrue()) {
-            for (int offset = 0; offset <= horizon; offset++) {
-                LocalDate date = today.plusDays(offset);
+            for (LocalDate date = firstDateToGenerate(today, plan.getGeneratedThrough()); !date.isAfter(through); date = date.plusDays(1)) {
                 if (!plan.getDays().contains(date.getDayOfWeek())) continue;
                 if (planItemRepository.existsByRecurringPlanIdAndTargetDate(plan.getId(), date)) continue;
                 PlanItemRequest request = PlanItemRequest.builder()
@@ -94,8 +99,14 @@ public class RecurringPlanService {
                         .build();
                 created.add(planItemService.create(request));
             }
+            if (plan.getGeneratedThrough() == null || plan.getGeneratedThrough().isBefore(through)) plan.setGeneratedThrough(through);
         }
         return created;
+    }
+
+    /** The first date a routine still has to generate: today, or the day after it last generated through. */
+    static LocalDate firstDateToGenerate(LocalDate today, LocalDate generatedThrough) {
+        return generatedThrough == null || generatedThrough.isBefore(today) ? today : generatedThrough.plusDays(1);
     }
 
     private RecurringPlan get(Long id) {

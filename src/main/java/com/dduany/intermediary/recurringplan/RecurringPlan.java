@@ -21,6 +21,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.DayOfWeek;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -63,6 +64,10 @@ public class RecurringPlan {
 
     @Column(name = "active", nullable = false)
     private boolean active;
+
+    /** Last date covered by generation; null until the routine has generated anything. */
+    @Column(name = "generated_through")
+    private LocalDate generatedThrough;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)

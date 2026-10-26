@@ -18,6 +18,12 @@ import { z } from 'zod'
 const API_URL = (process.env.INTERMEDIARY_API_URL ?? 'http://localhost:8080').replace(/\/$/, '')
 const USERNAME = process.env.INTERMEDIARY_USERNAME
 const PASSWORD = process.env.INTERMEDIARY_PASSWORD
+const APP_TIMEZONE = process.env.APP_TIMEZONE ?? 'America/New_York'
+
+/** Calendar date (YYYY-MM-DD) of an instant in the app's zone, matching the server's "today". */
+function localDate(date: Date, timeZone = APP_TIMEZONE): string {
+    return new Intl.DateTimeFormat('en-CA', { timeZone, year: 'numeric', month: '2-digit', day: '2-digit' }).format(date)
+}
 
 // ---- API client (same contract as the frontend) ---------------------------------------------
 
@@ -38,15 +44,16 @@ async function login(): Promise<string> {
     return token
 }
 
-async function api<T>(path: string, init?: RequestInit): Promise<T> {
+async function api<T>(path: string, init?: RequestInit, retried = false): Promise<T> {
     if (!token || Date.now() > tokenExpires) await login()
     const res = await fetch(`${API_URL}${path}`, {
         ...init,
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}`, ...(init?.headers ?? {}) },
     })
     if (res.status === 401) {
+        if (retried) throw new Error(`${init?.method ?? 'GET'} ${path} -> 401: still 401 after re-login. Check INTERMEDIARY_USERNAME / INTERMEDIARY_PASSWORD.`)
         await login()
-        return api<T>(path, init)
+        return api<T>(path, init, true)
     }
     const text = await res.text()
     if (!res.ok) throw new Error(`${init?.method ?? 'GET'} ${path} -> ${res.status}: ${text.slice(0, 300)}`)
@@ -96,7 +103,7 @@ server.registerTool(
         inputSchema: { days: z.number().int().min(1).max(90).default(14).describe('How many past days of sessions and events to include') },
     },
     async ({ days }) => {
-        const since = new Date(Date.now() - days * 86_400_000).toISOString().slice(0, 10)
+        const since = localDate(new Date(Date.now() - days * 86_400_000))
         const [items, study, fitness, certs, apps, events] = await Promise.all([
             api<PlanItem[]>('/plan-items'),
             api<{ sessionDate: string; planItemId: number | null }[]>('/study-sessions'),
@@ -117,7 +124,7 @@ server.registerTool(
         const closed = items.filter((p) => !isOpen(p) && (closedAt.get(p.id) ?? p.updatedAt) >= since)
             .sort((a, b) => (closedAt.get(b.id) ?? b.updatedAt).localeCompare(closedAt.get(a.id) ?? a.updatedAt))
         return text({
-            today: new Date().toISOString().slice(0, 10),
+            today: localDate(new Date()),
             openPlanItems: strip(items.filter(isOpen)),
             recentlyClosedPlanItems: strip(closed).map((c, i) => ({ ...c, closedAt: closedAt.get(closed[i].id) ?? closed[i].updatedAt })),
             closedPlanItemsCount: items.length - items.filter(isOpen).length,
