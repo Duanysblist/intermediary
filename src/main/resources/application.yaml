@@ -18,18 +18,13 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
         format_sql: true
         # Instants are stored as UTC regardless of the server clock, so timestamps mean the same thing everywhere.
         timezone.default_storage: NORMALIZE_UTC
     open-in-view: false
-
-logging:
-  level:
-    org.hibernate.SQL: DEBUG
-    org.hibernate.orm.jdbc.bind: TRACE
 
 server:
   port: ${PORT:8080}
@@ -55,3 +50,5 @@ app:
     # Leave empty to disable POST /ai/suggest.
     api-key: ${ANTHROPIC_API_KEY:}
     model: ${APP_AI_MODEL:claude-opus-5}
+    # Calls to POST /ai/suggest allowed per UTC day, per server instance (in memory).
+    daily-suggest-limit: ${APP_AI_DAILY_SUGGEST_LIMIT:100}

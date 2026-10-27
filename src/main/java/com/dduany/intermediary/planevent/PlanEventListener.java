@@ -1,6 +1,8 @@
 package com.dduany.intermediary.planevent;
 
 import com.dduany.intermediary.planitem.PlanItemStatusChangedEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
@@ -15,6 +17,8 @@ import org.springframework.transaction.event.TransactionalEventListener;
 @Component
 public class PlanEventListener {
 
+    private static final Logger log = LoggerFactory.getLogger(PlanEventListener.class);
+
     private final PlanEventService planEventService;
 
     public PlanEventListener(PlanEventService planEventService) {
@@ -23,11 +27,16 @@ public class PlanEventListener {
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleStatusChange(PlanItemStatusChangedEvent event) {
-        planEventService.recordTransition(
-                event.getPlanItemId(),
-                event.getFromStatus(),
-                event.getToStatus(),
-                null // notes - null for auto-generated events
-        );
+        // The item is already committed; an audit failure must not turn the caller's successful save into an error.
+        try {
+            planEventService.recordTransition(
+                    event.getPlanItemId(),
+                    event.getFromStatus(),
+                    event.getToStatus(),
+                    null // notes - null for auto-generated events
+            );
+        } catch (RuntimeException ex) {
+            log.error("Could not record plan event for plan item {}: {}", event.getPlanItemId(), ex.getClass().getSimpleName());
+        }
     }
 }

@@ -48,6 +48,9 @@ claude mcp add intermediary -e INTERMEDIARY_API_URL=https://intermediary-loxn.on
 
 Point `INTERMEDIARY_API_URL` at `http://localhost:8080` to work against a local backend.
 
+Optional `APP_TIMEZONE` (default `America/New_York`) sets which calendar day counts as "today" in
+`get_plan_overview`. Use the same zone as the API server's `APP_TIMEZONE`.
+
 ## Try it
 
 Ask Claude: *"Look at my plan and propose how next week should go."* It calls

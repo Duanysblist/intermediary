@@ -19,7 +19,7 @@ Both repos run CI on every push (backend tests with Testcontainers, Docker image
 ## What it does
 
 - **Plan.** A kanban board by status and a calendar week view. Drag to change status or date, or drop on the Unscheduled tray to clear the date. Every status change is recorded in the audit log.
-- **Routines.** "Workout B every Mon, Wed, Fri" generates plan items for the coming weeks; generation is idempotent.
+- **Routines.** "Workout B every Mon, Wed, Fri" generates plan items for the coming weeks. Generation remembers how far it has gone, so items you delete or move stay that way until you change the routine.
 - **Log reality.** Study sessions (linked to a certification) and workouts, logged from the Sessions page or straight from a plan item card, which also marks the item done.
 - **Review.** A weekly page comparing intention with reality: completion rate, planned versus done by intent, study minutes per certification, what slipped, which intentions get deferred most often.
 - **Prompt.** Packages the data you choose, with a computed week summary, as Markdown plus JSON. Send it to Claude from the server, open it in claude.ai, or copy it anywhere. The reply comes back as a **change set** you review line by line before applying, and applied batches can be reverted for a week.
@@ -76,7 +76,7 @@ Collections with `GET`, `GET /{id}`, `POST`, `PUT /{id}` and `DELETE /{id}`: `/p
 | Endpoint | Purpose |
 |---|---|
 | `GET /plan-events?planItemId=` | Read the audit log. Written by the server only. |
-| `POST /recurring-plans/generate?days=14` | Create plan items for every active routine on matching weekdays. Idempotent per routine and date. |
+| `POST /recurring-plans/generate?days=14` | Create plan items for every active routine on matching weekdays, continuing from where the last run stopped. Safe to repeat. |
 | `POST /proposals` · `GET /proposals?status=PENDING` · `PUT /proposals/{id}/status` | Change sets waiting for review. |
 | `POST /ai/suggest` · `GET /ai/status` | Ask Claude for a change set (needs `ANTHROPIC_API_KEY`). |
 | `GET /calendar/link` → `GET /calendar.ics?token=` | iCalendar feed of dated plan items. |
@@ -153,6 +153,8 @@ The API is a Docker image; set these variables wherever it runs. Anything secret
 | `APP_CORS_ORIGINS` | Comma-separated browser origins, e.g. the Vercel URL. |
 | `ANTHROPIC_API_KEY` | Optional. Enables `POST /ai/suggest`. |
 | `APP_AI_MODEL` | Optional. Default `claude-opus-5`. |
+
+Always set `APP_PASSWORD` and `APP_JWT_SECRET` on a deployed instance: if they are unset, the generated password is printed in the startup log.
 
 Schema changes are Flyway migrations in `src/main/resources/db/migration`; Hibernate only validates. Databases created before Flyway was introduced are baselined automatically at V1.
 

@@ -6,11 +6,13 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Map;
 
@@ -21,9 +23,11 @@ import java.util.Map;
 public class AiController {
 
     private final AiService aiService;
+    private final SuggestQuota quota;
 
-    public AiController(AiService aiService) {
+    public AiController(AiService aiService, SuggestQuota quota) {
         this.aiService = aiService;
+        this.quota = quota;
     }
 
     @GetMapping("/status")
@@ -35,6 +39,9 @@ public class AiController {
     @PostMapping("/suggest")
     @Operation(summary = "Ask Claude for plan changes given a context block; the answer is saved as a pending proposal, nothing is applied server-side")
     public SuggestResponse suggest(@Valid @RequestBody SuggestRequest request) {
+        if (!quota.tryAcquire()) {
+            throw new ResponseStatusException(HttpStatus.TOO_MANY_REQUESTS, "Daily Ask Claude limit reached. It resets at midnight UTC.");
+        }
         return aiService.suggest(request.getContext(), request.getRequest());
     }
 }
