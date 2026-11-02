@@ -164,6 +164,44 @@ class FeaturesTest {
                 .andExpect(jsonPath("$.title").value("New name"));
     }
 
+    long createItem(String title, String status) throws Exception {
+        String body = mvc.perform(post("/plan-items").header("Authorization", bearer).contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"title\":\"" + title + "\",\"intent\":\"OTHER\",\"status\":\"" + status + "\"}"))
+                .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString();
+        return json.readTree(body).get("id").asLong();
+    }
+
+    @Test
+    void orderSetsPositionsMovesColumnsAndAnEditToAnotherColumnClearsIt() throws Exception {
+        long a = createItem("a", "PLANNED"), b = createItem("b", "PLANNED"), c = createItem("c", "DONE");
+
+        // c is dragged from Done to the top of Planned.
+        mvc.perform(put("/plan-items/order").header("Authorization", bearer).contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"status\":\"PLANNED\",\"ids\":[" + c + "," + b + "," + a + "]}"))
+                .andExpect(status().isNoContent());
+        mvc.perform(get("/plan-items/" + c).header("Authorization", bearer))
+                .andExpect(jsonPath("$.status").value("PLANNED"))
+                .andExpect(jsonPath("$.position").value(0));
+        mvc.perform(get("/plan-events").param("planItemId", String.valueOf(c)).header("Authorization", bearer))
+                .andExpect(jsonPath("$[0].toStatus").value("PLANNED"));
+
+        // An edit that keeps the status keeps the position; one that changes it sends the item to the bottom.
+        mvc.perform(put("/plan-items/" + a).header("Authorization", bearer).contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"title\":\"a2\",\"intent\":\"OTHER\",\"status\":\"PLANNED\"}"))
+                .andExpect(jsonPath("$.position").value(2));
+        mvc.perform(put("/plan-items/" + a).header("Authorization", bearer).contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"title\":\"a2\",\"intent\":\"OTHER\",\"status\":\"DONE\"}"))
+                .andExpect(jsonPath("$.position").value((Object) null));
+
+        // An unknown id rejects the whole column.
+        mvc.perform(put("/plan-items/order").header("Authorization", bearer).contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"status\":\"DONE\",\"ids\":[" + b + ",999999]}"))
+                .andExpect(status().isNotFound());
+        mvc.perform(get("/plan-items/" + b).header("Authorization", bearer))
+                .andExpect(jsonPath("$.status").value("PLANNED"))
+                .andExpect(jsonPath("$.position").value(1));
+    }
+
     @Test
     void calendarFeedNeedsItsTokenAndListsDatedItems() throws Exception {
         mvc.perform(post("/plan-items").header("Authorization", bearer).contentType(MediaType.APPLICATION_JSON)

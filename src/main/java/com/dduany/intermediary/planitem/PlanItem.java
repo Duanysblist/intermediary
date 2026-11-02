@@ -65,6 +65,10 @@ public class PlanItem {
     @Column(name = "external_key", length = 120, unique = true)
     private String externalKey;
 
+    /** Order within its board column, set only by PUT /plan-items/order; null sorts last. */
+    @Column(name = "position")
+    private Integer position;
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
