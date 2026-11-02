@@ -32,6 +32,7 @@ public final class PlanItemMapper {
                 .referenceEntityId(entity.getReferenceEntityId())
                 .recurringPlanId(entity.getRecurringPlanId())
                 .notes(entity.getNotes())
+                .position(entity.getPosition())
                 .createdAt(entity.getCreatedAt())
                 .updatedAt(entity.getUpdatedAt())
                 .build();

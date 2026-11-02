@@ -1,5 +1,6 @@
 package com.dduany.intermediary.planitem;
 
+import com.dduany.intermediary.planitem.dto.PlanItemOrderRequest;
 import com.dduany.intermediary.planitem.dto.PlanItemRequest;
 import com.dduany.intermediary.planitem.dto.PlanItemResponse;
 import jakarta.validation.Valid;
@@ -41,6 +42,12 @@ public class PlanItemController {
     public ResponseEntity<PlanItemResponse> create(@Valid @RequestBody PlanItemRequest request) {
         PlanItemResponse response = service.create(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @PutMapping("/order")
+    public ResponseEntity<Void> reorder(@Valid @RequestBody PlanItemOrderRequest request) {
+        service.reorder(request);
+        return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/by-key")

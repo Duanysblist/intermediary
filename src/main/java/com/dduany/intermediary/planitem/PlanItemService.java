@@ -1,6 +1,7 @@
 package com.dduany.intermediary.planitem;
 
 import com.dduany.intermediary.exception.ResourceNotFoundException;
+import com.dduany.intermediary.planitem.dto.PlanItemOrderRequest;
 import com.dduany.intermediary.planitem.dto.PlanItemRequest;
 import com.dduany.intermediary.planitem.dto.PlanItemResponse;
 import org.springframework.context.ApplicationEventPublisher;
@@ -9,7 +10,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 // TODO: cross-field validation that (referenceEntityType, referenceEntityId) are both set or both null.
 // TODO: validate referenceEntityId points to an existing entity of the given type.
@@ -56,8 +61,9 @@ public class PlanItemService {
         item.setIntent(request.getIntent());
         item.setTargetDate(request.getTargetDate());
         item.setNotes(request.getNotes());
-        if (request.getStatus() != null) {
+        if (request.getStatus() != null && request.getStatus() != oldStatus) {
             item.setStatus(request.getStatus());
+            item.setPosition(null);
         }
         PlanItem saved = repository.saveAndFlush(item);
         if (oldStatus != saved.getStatus()) {
@@ -100,6 +106,9 @@ public class PlanItemService {
         existing.setReferenceEntityId(request.getReferenceEntityId());
         existing.setRecurringPlanId(request.getRecurringPlanId());
         existing.setNotes(request.getNotes());
+        if (existing.getStatus() != oldStatus) {
+            existing.setPosition(null); // a new column: it goes to the bottom until dragged
+        }
 
         PlanItem saved = repository.saveAndFlush(existing);
 
@@ -113,6 +122,31 @@ public class PlanItemService {
         }
 
         return PlanItemMapper.toResponse(saved);
+    }
+
+    /**
+     * Saves one board column after a drag: each id moves to the column's status (logged like any status
+     * change) and takes its index as its position. Items left out keep theirs. An unknown id changes nothing.
+     */
+    @Transactional
+    public void reorder(PlanItemOrderRequest request) {
+        List<Long> ids = request.ids();
+        Map<Long, PlanItem> byId = repository.findAllById(ids).stream()
+                .collect(Collectors.toMap(PlanItem::getId, Function.identity()));
+        List<PlanItemStatusChangedEvent> events = new ArrayList<>();
+        for (int i = 0; i < ids.size(); i++) {
+            PlanItem item = byId.get(ids.get(i));
+            if (item == null) {
+                throw new ResourceNotFoundException("Plan item not found with id: " + ids.get(i));
+            }
+            if (item.getStatus() != request.status()) {
+                events.add(new PlanItemStatusChangedEvent(item.getId(), item.getStatus(), request.status()));
+                item.setStatus(request.status());
+            }
+            item.setPosition(i);
+        }
+        repository.saveAllAndFlush(byId.values());
+        events.forEach(eventPublisher::publishEvent);
     }
 
     @Transactional

@@ -37,6 +37,8 @@ public class PlanItemResponse {
 
     private String notes;
 
+    private Integer position;
+
     private Instant createdAt;
 
     private Instant updatedAt;
