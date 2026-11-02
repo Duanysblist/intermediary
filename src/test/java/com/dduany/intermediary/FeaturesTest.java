@@ -115,6 +115,56 @@ class FeaturesTest {
     }
 
     @Test
+    void upsertByKeyUpdatesTheSameItemAndKeepsTheUsersStatus() throws Exception {
+        String first = mvc.perform(put("/plan-items/by-key").param("key", "tii:2030-03-04:block").header("Authorization", bearer)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"title\":\"A1\",\"intent\":\"STUDY\",\"targetDate\":\"2030-03-04\",\"notes\":\"v1\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("PLANNED"))
+                .andReturn().getResponse().getContentAsString();
+        long id = json.readTree(first).get("id").asLong();
+
+        mvc.perform(put("/plan-items/" + id).header("Authorization", bearer).contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"title\":\"A1\",\"intent\":\"STUDY\",\"targetDate\":\"2030-03-04\",\"status\":\"DONE\"}"))
+                .andExpect(status().isOk());
+
+        mvc.perform(put("/plan-items/by-key").param("key", "tii:2030-03-04:block").header("Authorization", bearer)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"title\":\"A1, Red\",\"intent\":\"STUDY\",\"targetDate\":\"2030-03-04\",\"notes\":\"v2\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(id))
+                .andExpect(jsonPath("$.title").value("A1, Red"))
+                .andExpect(jsonPath("$.notes").value("v2"))
+                .andExpect(jsonPath("$.status").value("DONE"));
+
+        // Once the day is graded, the sender's verdict wins.
+        mvc.perform(put("/plan-items/by-key").param("key", "tii:2030-03-04:block").header("Authorization", bearer)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"title\":\"A1, Red\",\"intent\":\"STUDY\",\"targetDate\":\"2030-03-04\",\"status\":\"CANCELED\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("CANCELED"));
+
+        mvc.perform(put("/plan-items/by-key").param("key", " ").header("Authorization", bearer)
+                        .contentType(MediaType.APPLICATION_JSON).content("{\"title\":\"x\",\"intent\":\"STUDY\"}"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void documentUpsertByPathKeepsOneRowPerLink() throws Exception {
+        String body = "{\"title\":\"%s\",\"path\":\"https://example.com/doc-upsert\",\"type\":\"GUIDE\"}";
+        String first = mvc.perform(put("/documents/by-path").header("Authorization", bearer).contentType(MediaType.APPLICATION_JSON)
+                        .content(body.formatted("Old name")))
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+        long id = json.readTree(first).get("id").asLong();
+
+        mvc.perform(put("/documents/by-path").header("Authorization", bearer).contentType(MediaType.APPLICATION_JSON)
+                        .content(body.formatted("New name")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(id))
+                .andExpect(jsonPath("$.title").value("New name"));
+    }
+
+    @Test
     void calendarFeedNeedsItsTokenAndListsDatedItems() throws Exception {
         mvc.perform(post("/plan-items").header("Authorization", bearer).contentType(MediaType.APPLICATION_JSON)
                         .content("{\"title\":\"On the calendar; yes, really\",\"intent\":\"READ\",\"targetDate\":\"2030-02-03\"}"))

@@ -4,8 +4,10 @@ import com.dduany.intermediary.exception.ResourceNotFoundException;
 import com.dduany.intermediary.planitem.dto.PlanItemRequest;
 import com.dduany.intermediary.planitem.dto.PlanItemResponse;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -29,6 +31,38 @@ public class PlanItemService {
         PlanItem planItem = PlanItemMapper.toEntity(request);
         applyDefaults(planItem);
         PlanItem saved = repository.save(planItem);
+        return PlanItemMapper.toResponse(saved);
+    }
+
+    /**
+     * Creates or updates the item another system owns under `key`. The sender owns the title, intent,
+     * date and notes. Status changes only when the request sends one (TII sends it once a day is graded),
+     * so ticking today's item done in the app survives the next sync.
+     */
+    @Transactional
+    public PlanItemResponse upsertByKey(String key, PlanItemRequest request) {
+        if (key == null || key.isBlank() || key.length() > 120) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "key must be 1 to 120 characters");
+        }
+        PlanItem item = repository.findByExternalKey(key).orElse(null);
+        if (item == null) {
+            item = PlanItemMapper.toEntity(request);
+            item.setExternalKey(key);
+            applyDefaults(item);
+            return PlanItemMapper.toResponse(repository.saveAndFlush(item));
+        }
+        PlanItemStatus oldStatus = item.getStatus();
+        item.setTitle(request.getTitle());
+        item.setIntent(request.getIntent());
+        item.setTargetDate(request.getTargetDate());
+        item.setNotes(request.getNotes());
+        if (request.getStatus() != null) {
+            item.setStatus(request.getStatus());
+        }
+        PlanItem saved = repository.saveAndFlush(item);
+        if (oldStatus != saved.getStatus()) {
+            eventPublisher.publishEvent(new PlanItemStatusChangedEvent(saved.getId(), oldStatus, saved.getStatus()));
+        }
         return PlanItemMapper.toResponse(saved);
     }
 

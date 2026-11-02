@@ -61,6 +61,10 @@ public class PlanItem {
     @Column(name = "notes", length = 2000)
     private String notes;
 
+    /** Set when another system owns this item and upserts it by key (PUT /plan-items/by-key). */
+    @Column(name = "external_key", length = 120, unique = true)
+    private String externalKey;
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;

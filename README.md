@@ -77,6 +77,8 @@ Collections with `GET`, `GET /{id}`, `POST`, `PUT /{id}` and `DELETE /{id}`: `/p
 |---|---|
 | `GET /plan-events?planItemId=` | Read the audit log. Written by the server only. |
 | `POST /recurring-plans/generate?days=14` | Create plan items for every active routine on matching weekdays, continuing from where the last run stopped. Safe to repeat. |
+| `PUT /plan-items/by-key?key=` | Create or update the item another system owns under `key` (TII sends `tii:<date>:<task>` daily). Status changes only when the body sends one, so a status set in the app survives. |
+| `PUT /documents/by-path` | Create the document at the body's `path`, or rename and retype the one already there. Version and notes stay. |
 | `POST /proposals` · `GET /proposals?status=PENDING` · `PUT /proposals/{id}/status` | Change sets waiting for review. |
 | `POST /ai/suggest` · `GET /ai/status` | Ask Claude for a change set (needs `ANTHROPIC_API_KEY`). |
 | `GET /calendar/link` → `GET /calendar.ics?token=` | iCalendar feed of dated plan items. |
