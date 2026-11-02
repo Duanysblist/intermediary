@@ -55,7 +55,6 @@ public class Application {
     private String jobUrl;
 
     // TODO: cross-field validation that salaryRangeMax >= salaryRangeMin
-    // Skipped for now - requires custom validator.
     @Column(name = "salary_range_min")
     private Integer salaryRangeMin;
 

@@ -28,7 +28,6 @@ import java.time.LocalDateTime;
 @Builder
 public class FitnessSession {
 
-    // Primary key
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

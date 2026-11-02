@@ -5,7 +5,6 @@ import com.dduany.intermediary.planevent.dto.PlanEventResponse;
 public final class PlanEventMapper {
 
     private PlanEventMapper() {
-        // utility class - prevent instantiation
     }
 
     public static PlanEventResponse toResponse(PlanEvent entity) {

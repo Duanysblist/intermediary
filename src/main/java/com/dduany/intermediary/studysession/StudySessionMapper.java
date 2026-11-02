@@ -6,7 +6,6 @@ import com.dduany.intermediary.studysession.dto.StudySessionResponse;
 public final class StudySessionMapper {
 
     private StudySessionMapper(){
-        // utility class - prevent instantiation
     }
 
     public static StudySession toEntity(StudySessionRequest request){

@@ -6,7 +6,6 @@ import com.dduany.intermediary.application.dto.ApplicationResponse;
 public final class ApplicationMapper {
 
     private ApplicationMapper() {
-        // utility class - prevent instantiation
     }
 
     public static Application toEntity(ApplicationRequest request) {

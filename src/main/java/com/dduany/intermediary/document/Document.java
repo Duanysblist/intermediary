@@ -19,7 +19,6 @@ import java.time.Instant;
 @Builder
 public class Document {
 
-    // Primary key
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

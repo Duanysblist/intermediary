@@ -6,7 +6,6 @@ import com.dduany.intermediary.recurringplan.dto.RecurringPlanResponse;
 public final class RecurringPlanMapper {
 
     private RecurringPlanMapper() {
-        // utility class - prevent instantiation
     }
 
     public static RecurringPlan toEntity(RecurringPlanRequest request) {

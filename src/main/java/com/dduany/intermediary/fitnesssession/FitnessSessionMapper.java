@@ -6,7 +6,6 @@ import com.dduany.intermediary.fitnesssession.dto.FitnessSessionResponse;
 public final class FitnessSessionMapper {
 
     private FitnessSessionMapper() {
-        // utility class - prevent instantiation
     }
 
     public static FitnessSession toEntity(FitnessSessionRequest request) {

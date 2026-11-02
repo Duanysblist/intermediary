@@ -35,7 +35,7 @@ public class PlanEvent {
     private Long planItemId;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "from_status")              // nullable - first event has no prior state
+    @Column(name = "from_status") // null on the first event
     private PlanItemStatus fromStatus;
 
     @Enumerated(EnumType.STRING)
@@ -52,6 +52,5 @@ public class PlanEvent {
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
-    // No @UpdateTimestamp — events are immutable.
-    // No updatedAt field — append-only audit log.
+    // No updatedAt: events are immutable.
 }
