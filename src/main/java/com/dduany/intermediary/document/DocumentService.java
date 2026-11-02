@@ -25,6 +25,19 @@ public class DocumentService {
         return DocumentMapper.toResponse(saved);
     }
 
+    /** Creates the document at request.path, or renames and retypes the one already there; version and notes stay the user's. */
+    @Transactional
+    public DocumentResponse upsertByPath(DocumentRequest request) {
+        Document document = repository.findFirstByPathOrderByIdAsc(request.getPath()).orElse(null);
+        if (document == null) {
+            document = DocumentMapper.toEntity(request);
+        } else {
+            document.setTitle(request.getTitle());
+            document.setType(request.getType() != null ? request.getType() : document.getType());
+        }
+        return DocumentMapper.toResponse(repository.saveAndFlush(document));
+    }
+
     @Transactional(readOnly = true)
     public DocumentResponse findById(Long id){
         Document document = repository.findById(id)

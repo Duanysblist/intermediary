@@ -42,6 +42,11 @@ public class DocumentController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    @PutMapping("/by-path")
+    public DocumentResponse upsertByPath(@Valid @RequestBody DocumentRequest request) {
+        return service.upsertByPath(request);
+    }
+
     @PutMapping("/{id}")
     public DocumentResponse update(@PathVariable Long id, @Valid @RequestBody DocumentRequest request) {
         return service.update(id, request);
