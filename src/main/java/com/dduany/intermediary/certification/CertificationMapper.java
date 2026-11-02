@@ -6,7 +6,6 @@ import com.dduany.intermediary.certification.dto.CertificationResponse;
 public final class CertificationMapper {
 
     private CertificationMapper() {
-        // utility class - prevent instantiation
     }
 
     public static Certification toEntity(CertificationRequest request) {

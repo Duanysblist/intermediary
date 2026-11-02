@@ -1,8 +1,8 @@
 # intermediary
 
-**A planning system that separates what you intend to do from what actually happened, and hands both to an AI without you re-explaining yourself.**
+A planning system that separates what you intend to do from what happened, and hands both to an AI so you don't re-explain yourself.
 
-Working with AI assistants on real, ongoing projects means repeating yourself: re-explaining context, re-stating intentions, re-paraphrasing the same plan. intermediary sits between you and the assistant. You work through structured input (a board, a calendar week, session logs); the assistant reads the same data as JSON and answers with changes you review before anything is applied.
+You work through structured input (a board, a calendar week, session logs). The assistant reads the same data as JSON and answers with changes you review before anything is applied.
 
 The data model is the planning model. **Plan items** are intentions: a title, an intent (study, exercise, apply, read, write), a status, an optional target date. **Study and fitness sessions** are reality: what happened, when, for how long, optionally linked back to the intention they fulfilled. **Plan events** are an append-only audit log of how each intention's status changed, written by the server on every transition. Everything else (certifications, applications, documents) is reference data an intention can point at.
 
@@ -14,7 +14,7 @@ The data model is the planning model. **Plan items** are intentions: a title, an
 | **API** | [intermediary-loxn.onrender.com/swagger-ui.html](https://intermediary-loxn.onrender.com/swagger-ui.html) (docs are public; calls need a sign-in token) |
 | **Frontend repo** | [Duanysblist/intermediary-frontend](https://github.com/Duanysblist/intermediary-frontend) |
 
-Both repos run CI on every push (backend tests with Testcontainers, Docker image build, MCP build; frontend lint, type-check, build) and deploy on merge to `main`.
+Both repos run CI on every push and deploy on merge to `main`.
 
 ## What it does
 
@@ -53,19 +53,19 @@ flowchart LR
     UI -->|review, apply| Inbox
 ```
 
-The AI never lives inside the app. It is a client of the same REST API, and every change it suggests goes through the same review and the same endpoints as a manual edit, so the audit log stays honest.
+The AI is a client of the same REST API. Its suggestions go through the same review and endpoints as a manual edit, so the audit log stays accurate.
 
 ### Key patterns
 
-**Feature-based packages.** Each domain concept (`planitem`, `certification`, `proposal`, …) is a self-contained package with its entity, repository, DTOs, mapper, service and controller.
+**Feature-based packages.** Each domain concept (`planitem`, `certification`, `proposal`, …) is one package with its entity, repository, DTOs, mapper, service and controller.
 
 **Intention vs reality.** Plan items and sessions are separate tables joined only by an optional `planItemId` on the session. That makes questions like "how often does what I plan match what I do?" answerable without a unified model.
 
 **Polymorphic references without JPA relationships.** A plan item points at any other record through `referenceEntityType` + `referenceEntityId`. No foreign keys, no inheritance hierarchy, no schema change when a new referenceable type appears.
 
-**Event-driven audit log with transactional safety.** `PlanItemService` publishes a status-change event; a listener records it with `@TransactionalEventListener(phase = AFTER_COMMIT)` in a `REQUIRES_NEW` transaction, so an audit entry exists only for changes that actually committed. Clients cannot write plan events.
+**Event-driven audit log.** `PlanItemService` publishes a status-change event. A listener records it `AFTER_COMMIT` in a `REQUIRES_NEW` transaction, so an audit entry exists only for changes that committed. Clients cannot write plan events.
 
-**Agents propose, humans apply.** The change-set contract (`ai/dto/ChangeSet`) is shared by the Claude endpoint, the MCP server, and the paste-import path in the frontend. The server stores proposals; the app applies them.
+**Agents propose, humans apply.** The change-set contract (`ai/dto/ChangeSet`) is shared by the Claude endpoint, the MCP server and the frontend's paste-import. The server stores proposals; the app applies them.
 
 ## API surface
 
@@ -107,17 +107,16 @@ The change-set shape, used everywhere a suggestion crosses a boundary:
 
 ## Running locally
 
-Requires Docker Desktop and JDK 21. Everything else is fetched by the wrappers.
+Requires Docker. Tests and IDE runs also need JDK 21; the Maven wrapper fetches the rest.
 
 ```bash
-git clone https://github.com/Duanysblist/intermediary.git
-cd intermediary
-docker compose up --build
+docker compose up --build          # API on http://localhost:8080, sign-in dev / dev
+docker compose --profile web up --build   # also the frontend on :3000 (frontend repo checked out beside this one)
+docker compose down -v             # reset all data
+./mvnw test                        # tests; each class starts its own PostgreSQL via Testcontainers
 ```
 
-The API is on `http://localhost:8080` with sign-in `dev` / `dev`. Add the frontend with `docker compose --profile web up --build` (needs the frontend repo checked out beside this one) and open `http://localhost:3000`. To reset all data: `docker compose down -v`.
-
-Copy `.env.example` to `.env` to override any default.
+Copy `.env.example` to `.env` to override defaults.
 
 ### In IntelliJ
 
@@ -142,7 +141,7 @@ Then register `mcp/dist/index.js` with Claude Desktop or Claude Code, with the A
 
 ## Deploying
 
-The API is a Docker image; set these variables wherever it runs. Anything secret has no default: an unset password or JWT secret becomes a random value printed in the log at startup.
+The API is a Docker image. Set these variables wherever it runs. An unset password or JWT secret becomes a random value generated at startup (the password is printed in the log), so set both on a deployed instance.
 
 | Variable | Purpose |
 |---|---|
@@ -151,15 +150,14 @@ The API is a Docker image; set these variables wherever it runs. Anything secret
 | `APP_JWT_SECRET` | At least 32 bytes (`openssl rand -base64 48`). Rotating it signs everyone out and changes the calendar feed link. |
 | `APP_TOKEN_TTL_HOURS` | Sign-in lifetime. Default 72. |
 | `APP_CORS_ORIGINS` | Comma-separated browser origins, e.g. the Vercel URL. |
+| `APP_TIMEZONE` | Your local zone, used for "today" (default `America/New_York`). |
 | `ANTHROPIC_API_KEY` | Optional. Enables `POST /ai/suggest`. |
 | `APP_AI_MODEL` | Optional. Default `claude-opus-5`. |
-
-Always set `APP_PASSWORD` and `APP_JWT_SECRET` on a deployed instance: if they are unset, the generated password is printed in the startup log.
+| `APP_AI_DAILY_SUGGEST_LIMIT` | Optional. `POST /ai/suggest` calls per UTC day. Default 100. |
 
 Schema changes are Flyway migrations in `src/main/resources/db/migration`; Hibernate only validates. Databases created before Flyway was introduced are baselined automatically at V1.
 
 ## Roadmap
 
-- **Done:** planning data layer with REST CRUD, event-driven audit log, containerised deployment, OpenAPI docs, Testcontainers test suite, JWT sign-in, drag-and-drop frontend with a public demo, Claude round-trip with review and undo, routines, session-to-intention links, weekly review, proposals inbox, MCP server, calendar feed, Flyway, CI.
 - **Next:** multi-user accounts, richer plan-vs-reality analytics, cross-field validation of polymorphic references.
 - **Later:** microservices split with Kafka for inter-service events, AWS deployment.

@@ -6,7 +6,6 @@ import com.dduany.intermediary.document.dto.DocumentResponse;
 public final class DocumentMapper {
 
     private DocumentMapper() {
-        // utility class - prevent instantiation
     }
 
     public static Document toEntity(DocumentRequest request) {

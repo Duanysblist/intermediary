@@ -26,7 +26,6 @@ import java.time.LocalDateTime;
 @Builder
 public class StudySession {
 
-    // Primary key
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

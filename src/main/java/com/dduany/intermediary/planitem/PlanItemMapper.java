@@ -6,7 +6,6 @@ import com.dduany.intermediary.planitem.dto.PlanItemResponse;
 public final class PlanItemMapper {
 
     private PlanItemMapper() {
-        // utility class - prevent instantiation
     }
 
     public static PlanItem toEntity(PlanItemRequest request){

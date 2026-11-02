@@ -20,7 +20,6 @@ import java.time.Instant;
 @Builder
 public class Certification {
 
-    // Primary key
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

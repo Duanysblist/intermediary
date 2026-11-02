@@ -55,3 +55,6 @@ logs/
 # Local planning / scratchpad files
 NEXT_SESSION.md
 SCRATCH.md
+
+# Stray folder written by the router plugin
+undefined/
